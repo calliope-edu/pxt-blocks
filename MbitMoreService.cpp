@@ -59,8 +59,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(commandChBuffer),
       MM_CH_BUFFER_SIZE_COMMAND,
       MM_CH_BUFFER_SIZE_COMMAND,
-      microbit_propWRITE | microbit_propWRITE_WITHOUT | microbit_propREAD,
-      1);
+      microbit_propWRITE | microbit_propWRITE_WITHOUT | microbit_propREAD);
     
 
   CreateCharacteristic(
@@ -69,8 +68,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(stateChBuffer),
       MM_CH_BUFFER_SIZE_STATE,
       MM_CH_BUFFER_SIZE_STATE,
-      microbit_propREAD,
-      1);
+      microbit_propREAD);
 
   CreateCharacteristic(
       mbitmore_cIdx_MOTION,
@@ -78,8 +76,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(motionChBuffer),
       MM_CH_BUFFER_SIZE_MOTION,
       MM_CH_BUFFER_SIZE_MOTION,
-      microbit_propREAD,
-      1);
+      microbit_propREAD);
 
   CreateCharacteristic(
       mbitmore_cIdx_PIN_EVENT,
@@ -87,8 +84,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(pinEventChBuffer),
       MM_CH_BUFFER_SIZE_NOTIFY,
       MM_CH_BUFFER_SIZE_NOTIFY,
-      microbit_propREAD | microbit_propNOTIFY,
-      1);
+      microbit_propREAD | microbit_propNOTIFY);
 
   CreateCharacteristic(
       mbitmore_cIdx_ACTION_EVENT,
@@ -96,8 +92,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(actionEventChBuffer),
       MM_CH_BUFFER_SIZE_NOTIFY,
       MM_CH_BUFFER_SIZE_NOTIFY,
-      microbit_propREAD | microbit_propNOTIFY,
-      1);
+      microbit_propREAD | microbit_propNOTIFY);
 
   CreateCharacteristic(
       mbitmore_cIdx_ANALOG_IN_P0,
@@ -105,8 +100,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(analogInP0ChBuffer),
       MM_CH_BUFFER_SIZE_ANALOG_IN,
       MM_CH_BUFFER_SIZE_ANALOG_IN,
-      microbit_propREAD | microbit_propREADAUTH,
-      1);
+      microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
       mbitmore_cIdx_ANALOG_IN_P1,
@@ -114,8 +108,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(analogInP1ChBuffer),
       MM_CH_BUFFER_SIZE_ANALOG_IN,
       MM_CH_BUFFER_SIZE_ANALOG_IN,
-      microbit_propREAD | microbit_propREADAUTH,
-      1);
+      microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
       mbitmore_cIdx_ANALOG_IN_P2,
@@ -123,8 +116,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(analogInP2ChBuffer),
       MM_CH_BUFFER_SIZE_ANALOG_IN,
       MM_CH_BUFFER_SIZE_ANALOG_IN,
-      microbit_propREAD | microbit_propREADAUTH,
-      1);
+      microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
       mbitmore_cIdx_ANALOG_IN_P3,
@@ -132,8 +124,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(analogInP3ChBuffer),
       MM_CH_BUFFER_SIZE_ANALOG_IN,
       MM_CH_BUFFER_SIZE_ANALOG_IN,
-      microbit_propREAD | microbit_propREADAUTH,
-      1);
+      microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
       mbitmore_cIdx_DATA,
@@ -141,8 +132,7 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
       (uint8_t *)(dataChBuffer),
       MM_CH_BUFFER_SIZE_NOTIFY,
       MM_CH_BUFFER_SIZE_NOTIFY,
-      microbit_propREAD | microbit_propNOTIFY,
-      1);
+      microbit_propREAD | microbit_propNOTIFY);
 
   // Stop advertising.
   // uBit.ble->stopAdvertising();
