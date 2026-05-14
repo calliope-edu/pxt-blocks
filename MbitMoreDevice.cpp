@@ -218,24 +218,19 @@ void MbitMoreDevice::onBLEConnected(MicroBitEvent _e) {
   fiber_sleep(100); // to change pull-mode in micro:bit v2
 #endif // MICROBIT_CODAL
   initializeConfig();
-  uBit.display.stopAnimation(); // To stop display friendly name.
-  uBit.display.print("C");
 }
 
 /**
  * @brief Invoked when BLE disconnected.
- * 
+ *
  * @param _e event which has disconnection data
  */
 void MbitMoreDevice::onBLEDisconnected(MicroBitEvent _e) {
-  uBit.reset(); // reset to off microphone and its LED.
+  // Intentionally empty: do not reset on BLE drop so USB serial stays alive.
 }
 
 void MbitMoreDevice::onSerialConnected() {
-  uBit.ble->stopAdvertising();
   initializeConfig();
-  uBit.display.stopAnimation(); // To stop display friendly name.
-  uBit.display.print("C");
   serialConnected = true;
 }
 

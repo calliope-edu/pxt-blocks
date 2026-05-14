@@ -1,11 +1,13 @@
 {
     "name": "scratch",
-    "version": "0.2.5",
-    "description": "",
+    "version": "0.3.0",
+    "description": "Calliope Blocks runtime — MbitMore BLE+USB sensor/actuator proxy for Scratch (Calliope mini 3 / CODAL)",
     "dependencies": {
         "core": "file:../core",
         "microphone": "file:../microphone",
-        "bluetooth": "file:../bluetooth"
+        "bluetooth": "file:../bluetooth",
+        "one-time-pairing": "file:../one-time-pairing",
+        "v3": "file:../v3"
     },
     "files": [
         "README.md",
@@ -35,27 +37,12 @@
     ],
     "preferredEditor": "blocksprj",
     "yotta": {
-        "dependencies": {
-            "microbit": "calliope-mini/microbit#calliope-more"
-        },
         "config": {
             "microbit-dal": {
-                "sram_end": "0x20008000",
-                "RAM_SIZE": "\"32K\"",
+                "gatt_table_size": "0x360",
                 "bluetooth": {
-                    "enabled": 1,
-                    "pairing_mode": 1,
-                    "private_addressing": 0,
-                    "open": 0,
-                    "whitelist": 1,
-                    "advertising_timeout": 0,
-                    "tx_power": 0,
-                    "dfu_service": 1,
-                    "event_service": 0,
-                    "device_info_service": 0,
-                    "security_level": "SECURITY_MODE_ENCRYPTION_NO_MITM"
-                },
-                "gatt_table_size": "0x360"
+                    "dfu_service": 1
+                }
             }
         }
     }

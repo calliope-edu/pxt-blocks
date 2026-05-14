@@ -240,10 +240,7 @@ void MbitMoreService::onDataRead(microbit_onDataRead_t *params) {
  * Periodic callback from MicroBit idle thread.
  */
 void MbitMoreService::idleCallback() {
-  if (getConnected()) {
-  } else {
-    mbitMore->displayFriendlyName();
-  }
+  // No-op: do not commandeer the display while disconnected.
 }
 
 /**
