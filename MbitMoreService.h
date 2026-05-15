@@ -10,34 +10,20 @@
 #if CONFIG_ENABLED(DEVICE_BLE)
 
 #include "MicroBit.h"
-#include "MicroBitMbitMoreService.h"
+#include "MicroBitBLEManager.h"
+#include "MicroBitBLEService.h"
 
 #include "MbitMoreCommon.h"
 #include "MbitMoreDevice.h"
 
-// Forward declaration
+// // Forward declaration
 class MbitMoreDevice;
 
 /**
- * pxt-blocks side of the MbitMore service.
- *
- * As of the CODAL refactor (codal-microbit-v2 ships an always-on
- * `MicroBitMbitMoreService` so the partial-flash DAL hash is identical
- * across all CODAL builds), this class no longer registers its own GATT
- * service. It is a thin shim that:
- *
- *   - Owns the per-characteristic byte buffers `MbitMoreDevice` and
- *     `MbitMoreSerial` write into directly (preserves their existing API).
- *   - Hooks the CODAL service's write / read-auth callbacks so writes from
- *     a Scratch central reach `MbitMoreDevice::onCommandReceived` and reads
- *     of the analog-in pins trigger `MbitMoreDevice::updateAnalogIn`.
- *   - Forwards `notify*` calls to the CODAL service's `notifyChar`.
- *   - Periodically mirrors fresh state/motion buffers into the CODAL
- *     service via `setCharValue` so plain reads see the latest values.
- *
- * The serial-side path through `MbitMoreSerial` is unchanged.
+ * Class definition for the Scratch basic Service.
+ * Provides a BLE service for default extension of micro:bit in Scratch3.
  */
-class MbitMoreService {
+class MbitMoreService : public MicroBitBLEService, MicroBitComponent {
 public:
   // Buffer of characteristic for receiving commands.
   uint8_t commandChBuffer[MM_CH_BUFFER_SIZE_COMMAND] = {0};
@@ -54,58 +40,167 @@ public:
   // Buffer of characteristic for sending action events.
   uint8_t actionEventChBuffer[MM_CH_BUFFER_SIZE_NOTIFY] = {0};
 
-  // Buffer of characteristic for sending analog input values of P0..P3.
+  // Buffer of characteristic for sending analog input values of P0.
   uint8_t analogInP0ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+
+  // Buffer of characteristic for sending analog input values of P1.
   uint8_t analogInP1ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+
+  // Buffer of characteristic for sending analog input values of P2.
   uint8_t analogInP2ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+
+   // Buffer of characteristic for sending analog input values of P3.
   uint8_t analogInP3ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
 
   // Buffer of characteristic for sending data.
   uint8_t dataChBuffer[MM_CH_BUFFER_SIZE_NOTIFY] = {0};
 
   /**
-   * Constructor. Wires up CODAL service callbacks and pushes initial
-   * version data into the COMMAND characteristic so the first central
-   * read returns sensible values.
+   * Constructor.
+   * Create a representation of default extension for Scratch3.
    */
   MbitMoreService();
 
   /**
-   * @brief Notify action / pin / data buffers via the CODAL service.
+   * Invoked when BLE connects.
    */
-  void notifyActionEvent();
-  void notifyPinEvent();
-  void notifyData();
-
-  /** Periodic notify hook (no-op — kept for fiber-loop call-site compat). */
-  void notify();
+  void onConnect(const microbit_ble_evt_t *p_ble_evt);
 
   /**
-   * Update state / motion buffers and mirror them into the CODAL
-   * service so plain reads return fresh values.
+   * Invoked when BLE disconnects.
    */
+  void onDisconnect(const microbit_ble_evt_t *p_ble_evt);
+
+  /**
+   * Callback. Invoked when any of our attributes are written via BLE.
+   */
+  void onDataWritten(const microbit_ble_evt_write_t *params);
+
+  /**
+   * Callback. Invoked when any of our attributes are read via BLE.
+   * Set  params->data and params->length to update the value
+   */
+  void onDataRead(microbit_onDataRead_t *params);
+
+  /**
+   * Periodic callback from MicroBit idle thread.
+   */
+  virtual void idleCallback();
+
+  /**
+   * @brief Notify action event.
+   */
+  void notifyActionEvent();
+
+  /**
+   * @brief Notify action event.
+   */
+  void notifyPinEvent();
+
+  /**
+   * @brief Notify sending data to Scratch
+   * 
+   */
+  void notifyData();
+
+  void notify();
+
   void update();
 
-  // Data-label glue — pure delegation to MbitMoreDevice (unchanged API).
+  /**
+   * @brief Register data label and retrun ID for the label.
+   *
+   * @param dataLabel label to register
+   * @param dataType type of the data to be received
+   * @return int ID for the label
+   */
   int registerWaitingDataLabel(ManagedString dataLabel, MbitMoreDataContentType dataType);
+
+  /**
+   * @brief Get type of content for the label
+   *
+   * @param labelID ID for the label
+   * @return type of content [number | string]
+   */
   MbitMoreDataContentType dataType(int labelID);
+
+  /**
+   * @brief Return content of the data as number
+   *
+   * @param labelID ID for the label
+   * @return content of the data
+   */
   float dataContentAsNumber(int labelID);
+
+  /**
+   * @brief Return content of the data as string
+   *
+   * @param labelID ID for the label
+   * @return content of the data
+   */
   ManagedString dataContentAsText(int labelID);
+
+  /**
+   * @brief Send a float with labele to Scratch.
+   *  
+   * @param dataLabel label of the data
+   * @param dataContent content of the data
+   */
   void sendNumberWithLabel(ManagedString dataLabel, float dataContent);
+
+  /**
+   * @brief Send a string with labele to Scratch.
+   * 
+   * @param dataLabel label of the data
+   * @param dataContent content of the data
+   */
   void sendTextWithLabel(ManagedString dataLabel, ManagedString dataContent);
 
 private:
+  /**
+   * @brief micro:bit runtime object.
+   *
+   */
   MicroBit &uBit;
+
+  /**
+   * @brief Microbit More object.
+   *
+   */
   MbitMoreDevice *mbitMore;
 
-  // Static dispatchers handed to the CODAL service. Function pointers
-  // (no `this`) — they reach the device through the MbitMoreDevice
-  // singleton.
-  static int s_onCommandWrite(const uint8_t *data, size_t len);
-  static size_t s_onAnalogReadP0(uint8_t *out, size_t bufSize);
-  static size_t s_onAnalogReadP1(uint8_t *out, size_t bufSize);
-  static size_t s_onAnalogReadP2(uint8_t *out, size_t bufSize);
-  static size_t s_onAnalogReadP3(uint8_t *out, size_t bufSize);
+  // Index for each charactersitic in arrays of handles and UUIDs
+  typedef enum mbitmore_cIdx
+  {
+    mbitmore_cIdx_COMMAND,
+    mbitmore_cIdx_STATE,
+    mbitmore_cIdx_MOTION,
+    mbitmore_cIdx_PIN_EVENT,
+    mbitmore_cIdx_ACTION_EVENT,
+    mbitmore_cIdx_ANALOG_IN_P0,
+    mbitmore_cIdx_ANALOG_IN_P1,
+    mbitmore_cIdx_ANALOG_IN_P2,
+    mbitmore_cIdx_ANALOG_IN_P3,
+    mbitmore_cIdx_DATA,
+    mbitmore_cIdx_COUNT
+  } mbitmore_cIdx;
+
+  // UUIDs for our service and characteristics
+  static const uint8_t baseUUID[16];
+  static const uint16_t serviceUUID;
+  static const uint16_t charUUID[mbitmore_cIdx_COUNT];
+
+  // Data for each characteristic when they are held by Soft Device.
+  MicroBitBLEChar chars[mbitmore_cIdx_COUNT];
+
+  /**
+   * Write IO characteristics.
+   */
+  void writeDigitalIn();
+
+public:
+  int characteristicCount() { return mbitmore_cIdx_COUNT; };
+  MicroBitBLEChar *characteristicPtr(int idx) { return &chars[idx]; };
 };
 
 #endif // CONFIG_ENABLED(DEVICE_BLE)
