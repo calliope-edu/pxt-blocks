@@ -34,16 +34,5 @@
     ],
     "supportedTargets": [
         "calliopemini"
-    ],
-    "preferredEditor": "blocksprj",
-    "yotta": {
-        "config": {
-            "microbit-dal": {
-                "gatt_table_size": "0x360",
-                "bluetooth": {
-                    "dfu_service": 1
-                }
-            }
-        }
-    }
+    ]
 }
