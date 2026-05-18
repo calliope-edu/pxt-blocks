@@ -1,7 +1,7 @@
 {
-    "name": "scratch",
+    "name": "blocks",
     "version": "0.3.0",
-    "description": "Calliope Blocks runtime — MbitMore BLE+USB sensor/actuator proxy for Scratch (Calliope mini 3 / CODAL)",
+    "description": "Calliope Blocks runtime — BLE+USB sensor/actuator proxy for the blocks editor (Calliope mini 3 / CODAL)",
     "dependencies": {
         "core": "file:../core",
         "microphone": "file:../microphone",
@@ -15,19 +15,19 @@
         "main.ts",
         "shims.d.ts",
         "enums.d.ts",
-        "MbitMore.cpp",
-        "MbitMore.ts",
-        "MbitMoreCommon.h",
-        "MbitMoreDevice.cpp",
-        "MbitMoreDevice.h",
-        "MbitMoreSerial.cpp",
-        "MbitMoreSerial.h",
-        "MbitMoreService.cpp",
-        "MbitMoreService.h",
-        "MbitMoreServiceDAL.cpp",
-        "MbitMoreServiceDAL.h",
-        "_locales/en/pxt-mbit-more-v2-strings.json",
-        "_locales/ja/pxt-mbit-more-v2-strings.json"
+        "Blocks.cpp",
+        "Blocks.ts",
+        "BlocksCommon.h",
+        "BlocksDevice.cpp",
+        "BlocksDevice.h",
+        "BlocksSerial.cpp",
+        "BlocksSerial.h",
+        "BlocksService.cpp",
+        "BlocksService.h",
+        "BlocksServiceDAL.cpp",
+        "BlocksServiceDAL.h",
+        "_locales/en/pxt-blocks-strings.json",
+        "_locales/ja/pxt-blocks-strings.json"
     ],
     "testFiles": [
         "test.ts"

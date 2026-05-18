@@ -3,14 +3,14 @@
 
 
     //% color=#FF9900 weight=95 icon="\uf1b0"
-declare namespace MbitMore {
+declare namespace Blocks {
 
     /**
      * @brief Start Microbit More service.
      * 
      */
-    //% shim=MbitMore::startMbitMoreService
-    function startMbitMoreService(): void;
+    //% shim=Blocks::startBlocksService
+    function startBlocksService(): void;
 
     /**
      * @brief Register a label in waiting data list and return an ID for the label.
@@ -20,8 +20,8 @@ declare namespace MbitMore {
      * @param dataType type of the data to be received
      * @return int ID for the label
      */
-    //% shim=MbitMore::call_registerWaitingDataLabel
-    function call_registerWaitingDataLabel(dataLabel: string, dataType: MbitMoreDataContentType): int32;
+    //% shim=Blocks::call_registerWaitingDataLabel
+    function call_registerWaitingDataLabel(dataLabel: string, dataType: BlocksDataContentType): int32;
 
     /**
      * @brief Get number which was received with the label.
@@ -29,7 +29,7 @@ declare namespace MbitMore {
      * @param labelID ID in registered labels
      * @return float received data with the label
      */
-    //% shim=MbitMore::call_dataContentAsNumber
+    //% shim=Blocks::call_dataContentAsNumber
     function call_dataContentAsNumber(labelID: int32): number;
 
     /**
@@ -38,27 +38,27 @@ declare namespace MbitMore {
      * @param labelID ID in registered labels
      * @return String received data with the label
      */
-    //% shim=MbitMore::call_dataContentAsText
+    //% shim=Blocks::call_dataContentAsText
     function call_dataContentAsText(labelID: int32): string;
 
     /**
-     * @brief Send a float with labele to Scratch.
-     * Do nothing if Scratch was not connected.
+     * @brief Send a float with labele to the blocks editor.
+     * Do nothing if the blocks editor was not connected.
      * 
      * @param dataLabel - label of the data
      * @param dataContent - content of the data
      */
-    //% shim=MbitMore::call_sendNumberWithLabel
+    //% shim=Blocks::call_sendNumberWithLabel
     function call_sendNumberWithLabel(dataLabel: string, dataContent: number): void;
 
     /**
-     * @brief Send a text with label to Scratch.
-     * Do nothing if Scratch was not connected.
+     * @brief Send a text with label to the blocks editor.
+     * Do nothing if the blocks editor was not connected.
      * 
      * @param dataLabel - label of the data
      * @param dataContent - content of the data
      */
-    //% shim=MbitMore::call_sendTextWithLabel
+    //% shim=Blocks::call_sendTextWithLabel
     function call_sendTextWithLabel(dataLabel: string, dataContent: string): void;
 }
 

@@ -5,8 +5,8 @@
 #include "nrf_saadc.h"
 
 /**
- * Class definition for the Scratch3 MicrobitMore Service.
- * Provides a BLE service to Scratch3.
+ * Class definition for the the blocks editor Blocks Service.
+ * Provides a BLE service to the blocks editor3.
  */
 #include "MicroBitConfig.h"
 
@@ -14,14 +14,14 @@
 
 // #include "ble_advdata.h"
 
-#include "MbitMoreService.h"
+#include "BlocksService.h"
 #include "MicroBitButton.h"
 #include "ble_advdata.h"
 
 // service ID: 0b50f3e4-607f-4151-9091-7d008d6ffc5c
-const uint8_t MbitMoreService::baseUUID[16] = {0x0b, 0x50, 0xf3, 0xe4, 0x60, 0x7f, 0x41, 0x51, 0x90, 0x91, 0x7d, 0x00, 0x8d, 0x6f, 0xfc, 0x5c};
-const uint16_t MbitMoreService::serviceUUID = 0xf3e4;
-const uint16_t MbitMoreService::charUUID[mbitmore_cIdx_COUNT] = {
+const uint8_t BlocksService::baseUUID[16] = {0x0b, 0x50, 0xf3, 0xe4, 0x60, 0x7f, 0x41, 0x51, 0x90, 0x91, 0x7d, 0x00, 0x8d, 0x6f, 0xfc, 0x5c};
+const uint16_t BlocksService::serviceUUID = 0xf3e4;
+const uint16_t BlocksService::charUUID[blocks_cIdx_COUNT] = {
     0x0100, // COMMAND
     0x0101, // STATE
     0x0102, // MOTION
@@ -41,11 +41,11 @@ const uint16_t MbitMoreService::charUUID[mbitmore_cIdx_COUNT] = {
 
 /**
  * Constructor.
- * Create a representation of default extension for Scratch3.
+ * Create a representation of default extension for the blocks editor.
  */
-MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
-  mbitMore = &MbitMoreDevice::getInstance();
-  mbitMore->moreService = this;
+BlocksService::BlocksService() : uBit(pxt::uBit) {
+  blocks = &BlocksDevice::getInstance();
+  blocks->moreService = this;
 
   // Create the service.
   bs_uuid_type = BLE_UUID_TYPE_UNKNOWN;
@@ -54,84 +54,84 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
 
   // Add each of our characteristics.
   CreateCharacteristic(
-      mbitmore_cIdx_COMMAND,
-      charUUID[mbitmore_cIdx_COMMAND],
+      blocks_cIdx_COMMAND,
+      charUUID[blocks_cIdx_COMMAND],
       (uint8_t *)(commandChBuffer),
-      MM_CH_BUFFER_SIZE_COMMAND,
-      MM_CH_BUFFER_SIZE_COMMAND,
+      BLOCKS_CH_BUFFER_SIZE_COMMAND,
+      BLOCKS_CH_BUFFER_SIZE_COMMAND,
       microbit_propWRITE | microbit_propWRITE_WITHOUT | microbit_propREAD);
     
 
   CreateCharacteristic(
-      mbitmore_cIdx_STATE,
-      charUUID[mbitmore_cIdx_STATE],
+      blocks_cIdx_STATE,
+      charUUID[blocks_cIdx_STATE],
       (uint8_t *)(stateChBuffer),
-      MM_CH_BUFFER_SIZE_STATE,
-      MM_CH_BUFFER_SIZE_STATE,
+      BLOCKS_CH_BUFFER_SIZE_STATE,
+      BLOCKS_CH_BUFFER_SIZE_STATE,
       microbit_propREAD);
 
   CreateCharacteristic(
-      mbitmore_cIdx_MOTION,
-      charUUID[mbitmore_cIdx_MOTION],
+      blocks_cIdx_MOTION,
+      charUUID[blocks_cIdx_MOTION],
       (uint8_t *)(motionChBuffer),
-      MM_CH_BUFFER_SIZE_MOTION,
-      MM_CH_BUFFER_SIZE_MOTION,
+      BLOCKS_CH_BUFFER_SIZE_MOTION,
+      BLOCKS_CH_BUFFER_SIZE_MOTION,
       microbit_propREAD);
 
   CreateCharacteristic(
-      mbitmore_cIdx_PIN_EVENT,
-      charUUID[mbitmore_cIdx_PIN_EVENT],
+      blocks_cIdx_PIN_EVENT,
+      charUUID[blocks_cIdx_PIN_EVENT],
       (uint8_t *)(pinEventChBuffer),
-      MM_CH_BUFFER_SIZE_NOTIFY,
-      MM_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
       microbit_propREAD | microbit_propNOTIFY);
 
   CreateCharacteristic(
-      mbitmore_cIdx_ACTION_EVENT,
-      charUUID[mbitmore_cIdx_ACTION_EVENT],
+      blocks_cIdx_ACTION_EVENT,
+      charUUID[blocks_cIdx_ACTION_EVENT],
       (uint8_t *)(actionEventChBuffer),
-      MM_CH_BUFFER_SIZE_NOTIFY,
-      MM_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
       microbit_propREAD | microbit_propNOTIFY);
 
   CreateCharacteristic(
-      mbitmore_cIdx_ANALOG_IN_P0,
-      charUUID[mbitmore_cIdx_ANALOG_IN_P0],
+      blocks_cIdx_ANALOG_IN_P0,
+      charUUID[blocks_cIdx_ANALOG_IN_P0],
       (uint8_t *)(analogInP0ChBuffer),
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
       microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
-      mbitmore_cIdx_ANALOG_IN_P1,
-      charUUID[mbitmore_cIdx_ANALOG_IN_P1],
+      blocks_cIdx_ANALOG_IN_P1,
+      charUUID[blocks_cIdx_ANALOG_IN_P1],
       (uint8_t *)(analogInP1ChBuffer),
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
       microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
-      mbitmore_cIdx_ANALOG_IN_P2,
-      charUUID[mbitmore_cIdx_ANALOG_IN_P2],
+      blocks_cIdx_ANALOG_IN_P2,
+      charUUID[blocks_cIdx_ANALOG_IN_P2],
       (uint8_t *)(analogInP2ChBuffer),
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
       microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
-      mbitmore_cIdx_ANALOG_IN_P3,
-      charUUID[mbitmore_cIdx_ANALOG_IN_P3],
+      blocks_cIdx_ANALOG_IN_P3,
+      charUUID[blocks_cIdx_ANALOG_IN_P3],
       (uint8_t *)(analogInP3ChBuffer),
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
-      MM_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
+      BLOCKS_CH_BUFFER_SIZE_ANALOG_IN,
       microbit_propREAD | microbit_propREADAUTH);
 
   CreateCharacteristic(
-      mbitmore_cIdx_DATA,
-      charUUID[mbitmore_cIdx_DATA],
+      blocks_cIdx_DATA,
+      charUUID[blocks_cIdx_DATA],
       (uint8_t *)(dataChBuffer),
-      MM_CH_BUFFER_SIZE_NOTIFY,
-      MM_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
+      BLOCKS_CH_BUFFER_SIZE_NOTIFY,
       microbit_propREAD | microbit_propNOTIFY);
 
   // Stop advertising.
@@ -182,23 +182,23 @@ MbitMoreService::MbitMoreService() : uBit(pxt::uBit) {
 /**
  * Invoked when BLE connects.
  */
-void MbitMoreService::onConnect(const microbit_ble_evt_t *p_ble_evt) {
-  mbitMore->updateVersionData();
+void BlocksService::onConnect(const microbit_ble_evt_t *p_ble_evt) {
+  blocks->updateVersionData();
 }
 
 /**
  * Invoked when BLE disconnects.
  */
-void MbitMoreService::onDisconnect(const microbit_ble_evt_t *p_ble_evt) {
+void BlocksService::onDisconnect(const microbit_ble_evt_t *p_ble_evt) {
   // uBit.ble->advertise();
 }
 
 /**
  * Callback. Invoked when any of our attributes are written via BLE.
  */
-void MbitMoreService::onDataWritten(const microbit_ble_evt_write_t *params) {
-  if (params->handle == valueHandle(mbitmore_cIdx_COMMAND) && params->len > 0) {
-    mbitMore->onCommandReceived((uint8_t *)params->data, params->len);
+void BlocksService::onDataWritten(const microbit_ble_evt_write_t *params) {
+  if (params->handle == valueHandle(blocks_cIdx_COMMAND) && params->len > 0) {
+    blocks->onCommandReceived((uint8_t *)params->data, params->len);
   }
 }
 
@@ -206,21 +206,21 @@ void MbitMoreService::onDataWritten(const microbit_ble_evt_write_t *params) {
  * Callback. Invoked when any of our attributes are read via BLE.
  * Set  params->data and params->length to update the value
  */
-void MbitMoreService::onDataRead(microbit_onDataRead_t *params) {
-  if (params->handle == valueHandle(mbitmore_cIdx_ANALOG_IN_P0)) {
-    mbitMore->updateAnalogIn(analogInP0ChBuffer, 0);
+void BlocksService::onDataRead(microbit_onDataRead_t *params) {
+  if (params->handle == valueHandle(blocks_cIdx_ANALOG_IN_P0)) {
+    blocks->updateAnalogIn(analogInP0ChBuffer, 0);
     params->data = analogInP0ChBuffer;
     params->length = 2;
-  } else if (params->handle == valueHandle(mbitmore_cIdx_ANALOG_IN_P1)) {
-    mbitMore->updateAnalogIn(analogInP1ChBuffer, 1);
+  } else if (params->handle == valueHandle(blocks_cIdx_ANALOG_IN_P1)) {
+    blocks->updateAnalogIn(analogInP1ChBuffer, 1);
     params->data = analogInP1ChBuffer;
     params->length = 2;
-  } else if (params->handle == valueHandle(mbitmore_cIdx_ANALOG_IN_P2)) {
-    mbitMore->updateAnalogIn(analogInP2ChBuffer, 2);
+  } else if (params->handle == valueHandle(blocks_cIdx_ANALOG_IN_P2)) {
+    blocks->updateAnalogIn(analogInP2ChBuffer, 2);
     params->data = analogInP2ChBuffer;
     params->length = 2;
-  } else if (params->handle == valueHandle(mbitmore_cIdx_ANALOG_IN_P3)) {
-    mbitMore->updateAnalogIn(analogInP3ChBuffer, 3);
+  } else if (params->handle == valueHandle(blocks_cIdx_ANALOG_IN_P3)) {
+    blocks->updateAnalogIn(analogInP3ChBuffer, 3);
     params->data = analogInP3ChBuffer;
     params->length = 2;
   }
@@ -229,51 +229,51 @@ void MbitMoreService::onDataRead(microbit_onDataRead_t *params) {
 /**
  * Periodic callback from MicroBit idle thread.
  */
-void MbitMoreService::idleCallback() {
+void BlocksService::idleCallback() {
   // No-op: do not commandeer the display while disconnected.
 }
 
 /**
  * @brief Notify action event.
  */
-void MbitMoreService::notifyActionEvent() {
+void BlocksService::notifyActionEvent() {
   if (!getConnected())
     return;
-  notifyChrValue(mbitmore_cIdx_ACTION_EVENT, actionEventChBuffer,
-                 MM_CH_BUFFER_SIZE_NOTIFY);
+  notifyChrValue(blocks_cIdx_ACTION_EVENT, actionEventChBuffer,
+                 BLOCKS_CH_BUFFER_SIZE_NOTIFY);
 }
 
 /**
  * @brief Notify pin event.
  */
-void MbitMoreService::notifyPinEvent() {
+void BlocksService::notifyPinEvent() {
   if (!getConnected())
     return;
-  notifyChrValue(mbitmore_cIdx_PIN_EVENT, pinEventChBuffer,
-                 MM_CH_BUFFER_SIZE_NOTIFY);
+  notifyChrValue(blocks_cIdx_PIN_EVENT, pinEventChBuffer,
+                 BLOCKS_CH_BUFFER_SIZE_NOTIFY);
 }
 
 /**
- * Notify message to Scratch3
+ * Notify message to the blocks editor3
  */
-void MbitMoreService::notifyData() {
+void BlocksService::notifyData() {
   if (!getConnected())
     return;
-  notifyChrValue(mbitmore_cIdx_DATA, dataChBuffer, MM_CH_BUFFER_SIZE_NOTIFY);
+  notifyChrValue(blocks_cIdx_DATA, dataChBuffer, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
 }
 
 /**
- * Notify data to Scratch3
+ * Notify data to the blocks editor3
  */
-void MbitMoreService::notify() {}
+void BlocksService::notify() {}
 
 /**
  * Update all sensors.
  */
-void MbitMoreService::update() {
+void BlocksService::update() {
   if (getConnected()) {
-    mbitMore->updateState(stateChBuffer);
-    mbitMore->updateMotion(motionChBuffer);
+    blocks->updateState(stateChBuffer);
+    blocks->updateMotion(motionChBuffer);
   }
 }
 
@@ -284,8 +284,8 @@ void MbitMoreService::update() {
  * @param dataType type of the data to be received
  * @return int ID for the label
  */
-int MbitMoreService::registerWaitingDataLabel(ManagedString dataLabel, MbitMoreDataContentType dataType) {
-  return mbitMore->registerWaitingDataLabel(dataLabel, dataType);
+int BlocksService::registerWaitingDataLabel(ManagedString dataLabel, BlocksDataContentType dataType) {
+  return blocks->registerWaitingDataLabel(dataLabel, dataType);
 }
 
 /**
@@ -294,8 +294,8 @@ int MbitMoreService::registerWaitingDataLabel(ManagedString dataLabel, MbitMoreD
  * @param labelID ID for the label
  * @return type of content [number | string]
  */
-MbitMoreDataContentType MbitMoreService::dataType(int labelID) {
-  return mbitMore->dataType(labelID);
+BlocksDataContentType BlocksService::dataType(int labelID) {
+  return blocks->dataType(labelID);
 }
 
 /**
@@ -304,8 +304,8 @@ MbitMoreDataContentType MbitMoreService::dataType(int labelID) {
  * @param labelID ID for the label
  * @return content of the data
  */
-float MbitMoreService::dataContentAsNumber(int labelID) {
-  return mbitMore->dataContentAsNumber(labelID);
+float BlocksService::dataContentAsNumber(int labelID) {
+  return blocks->dataContentAsNumber(labelID);
 }
 
 /**
@@ -314,28 +314,28 @@ float MbitMoreService::dataContentAsNumber(int labelID) {
  * @param labelID ID for the label
  * @return content of the data
  */
-ManagedString MbitMoreService::dataContentAsText(int labelID) {
-  return mbitMore->dataContentAsText(labelID);
+ManagedString BlocksService::dataContentAsText(int labelID) {
+  return blocks->dataContentAsText(labelID);
 }
 
 /**
- * @brief Send a float with label to Scratch.
+ * @brief Send a float with label to the blocks editor.
  *  
  * @param dataLabel label of the data
  * @param dataContent content of the data
  */
-void MbitMoreService::sendNumberWithLabel(ManagedString dataLabel, float dataContent) {
-  mbitMore->sendNumberWithLabel(dataLabel, dataContent);
+void BlocksService::sendNumberWithLabel(ManagedString dataLabel, float dataContent) {
+  blocks->sendNumberWithLabel(dataLabel, dataContent);
 }
 
 /**
- * @brief Send a string with label to Scratch.
+ * @brief Send a string with label to the blocks editor.
  * 
  * @param dataLabel label of the data
  * @param dataContent content of the data
  */
-void MbitMoreService::sendTextWithLabel(ManagedString dataLabel, ManagedString dataContent) {
-  mbitMore->sendTextWithLabel(dataLabel, dataContent);
+void BlocksService::sendTextWithLabel(ManagedString dataLabel, ManagedString dataContent) {
+  blocks->sendTextWithLabel(dataLabel, dataContent);
 }
 
 #endif // CONFIG_ENABLED(DEVICE_BLE)

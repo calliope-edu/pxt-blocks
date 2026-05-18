@@ -1,0 +1,11 @@
+{
+  "Blocks.onReceivedNumberWithLabel|block": "on number $numberData with label $label",
+  "Blocks.onReceivedTextWithLabel|block": "on text $textData with label $label",
+  "Blocks.sendNumberWithLabel|block": "send number $numberData with label $label",
+  "Blocks.sendTextWithLabel|block": "send text $textData with label $label",
+  "Blocks.startService|block": "start Microbit More service",
+  "BlocksDataContentType.BLOCKS_DATA_NUMBER|block": "number",
+  "BlocksDataContentType.BLOCKS_DATA_TEXT|block": "text",
+  "Blocks|block": "Microbit More",
+  "{id:category}Blocks": "Microbit More"
+}

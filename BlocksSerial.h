@@ -1,36 +1,36 @@
-#include "MbitMoreCommon.h"
-#if MBIT_MORE_USE_SERIAL
+#include "BlocksCommon.h"
+#if BLOCKS_USE_SERIAL
 
-#ifndef MBIT_MORE_SERIAL_H
-#define MBIT_MORE_SERIAL_H
+#ifndef BLOCKS_SERIAL_H
+#define BLOCKS_SERIAL_H
 
-#include "MbitMoreDevice.h"
+#include "BlocksDevice.h"
 
-#define MM_SFD 0xff
-#define MM_RX_BUFFER_SIZE 254
-#define MM_TX_BUFFER_SIZE 254
+#define BLOCKS_SFD 0xff
+#define BLOCKS_RX_BUFFER_SIZE 254
+#define BLOCKS_TX_BUFFER_SIZE 254
 
 // // Forward declaration
-class MbitMoreDevice;
+class BlocksDevice;
 
 /**
  * Class definition for main logics of Microbit More Service except bluetooth connectivity.
  *
  */
-class MbitMoreSerial {
+class BlocksSerial {
 private:
   /**
-   * @brief Communication route between Scratch and micro:bit
+   * @brief Communication route between the blocks editor and the device
    * 
    */
-  enum MbitMoreCommunicationRoute
+  enum BlocksCommunicationRoute
   {
     BLE = 0,
     SERIAL = 1,
   };
 
   /**
-   * @brief Request type from Scratch
+   * @brief Request type from the blocks editor
    * 
    */
   enum ChRequest
@@ -43,7 +43,7 @@ private:
   };
 
   /**
-   * @brief Response type to Scratch
+   * @brief Response type to the blocks editor
    * 
    */
   enum ChResponse
@@ -58,14 +58,14 @@ public:
    * @brief Microbit More object.
    *
    */
-  MbitMoreDevice &mbitMore;
+  BlocksDevice &blocks;
 
   /**
    * @brief Construct a new Microbit More Serial service
    * 
-   * @param _mbitMore An instance of Microbit More device controller
+   * @param _blocks An instance of Microbit More device controller
    */
-  MbitMoreSerial(MbitMoreDevice &_mbitMore);
+  BlocksSerial(BlocksDevice &_blocks);
 
   /**
    * @brief Send a response for read request.
@@ -105,5 +105,5 @@ public:
    */
   void startSerialUpdating();
 };
-#endif // MBIT_MORE_SERIAL_H
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_SERIAL_H
+#endif // BLOCKS_USE_SERIAL

@@ -1,35 +1,35 @@
-#ifndef MBIT_MORE_COMMON_H
-#define MBIT_MORE_COMMON_H
+#ifndef BLOCKS_COMMON_H
+#define BLOCKS_COMMON_H
 
 #include "pxt.h"
 
 #if MICROBIT_CODAL
-#define MBIT_MORE_USE_SERIAL 1 // 1 for use USB serial
+#define BLOCKS_USE_SERIAL 1 // 1 for use USB serial
 #else // MICROBIT_CODAL
 // v1 has not enough memory space
-#define MBIT_MORE_USE_SERIAL 0 // 1 for use USB serial
+#define BLOCKS_USE_SERIAL 0 // 1 for use USB serial
 #endif // MICROBIT_CODAL
 
-#define MBIT_MORE_DATA_RECEIVED 8000
+#define BLOCKS_DATA_RECEIVED 8000
 
 /**
  * Data type of content.
  */
-enum MbitMoreDataContentType
+enum BlocksDataContentType
 {
   //% block="number"
-  MM_DATA_NUMBER = 1,
+  BLOCKS_DATA_NUMBER = 1,
   //% block="text"
-  MM_DATA_TEXT = 2,
+  BLOCKS_DATA_TEXT = 2,
 };
 
-#define MM_CH_BUFFER_SIZE_COMMAND 20
-#define MM_CH_BUFFER_SIZE_NOTIFY 20
-#define MM_CH_BUFFER_SIZE_STATE 7
-#define MM_CH_BUFFER_SIZE_MOTION 18
-#define MM_CH_BUFFER_SIZE_ANALOG_IN 2
+#define BLOCKS_CH_BUFFER_SIZE_COMMAND 20
+#define BLOCKS_CH_BUFFER_SIZE_NOTIFY 20
+#define BLOCKS_CH_BUFFER_SIZE_STATE 7
+#define BLOCKS_CH_BUFFER_SIZE_MOTION 18
+#define BLOCKS_CH_BUFFER_SIZE_ANALOG_IN 2
 
-enum MbitMoreCommand // 3 bits (0x00..0x07)
+enum BlocksCommand // 3 bits (0x00..0x07)
 {
   CMD_CONFIG = 0x00,
   CMD_PIN = 0x01,
@@ -40,7 +40,7 @@ enum MbitMoreCommand // 3 bits (0x00..0x07)
   CMD_MOTOR = 0x06,
 };
 
-enum MbitMoreMotorCommand
+enum BlocksMotorCommand
 {
   SET_M0 = 0x01,
   SET_M1 = 0x02,
@@ -50,7 +50,7 @@ enum MbitMoreMotorCommand
   SET_MOTIONKIT_BOTH = 0x06,
 };
 
-enum MbitMorePinCommand
+enum BlocksPinCommand
 {
   SET_OUTPUT = 0x01,
   SET_PWM = 0x02,
@@ -59,7 +59,7 @@ enum MbitMorePinCommand
   SET_EVENT = 0x05,
 };
 
-enum MbitMoreDisplayCommand
+enum BlocksDisplayCommand
 {
   CLEAR = 0x00,
   TEXT = 0x01,
@@ -70,20 +70,20 @@ enum MbitMoreDisplayCommand
 /**
  * @brief Enum for write mode of display pixels.
  */
-enum MbitMoreDisplayWriteMode
+enum BlocksDisplayWriteMode
 {
   LAYER = 0,
   OVER_WRITE = 1
 };
 
-enum MbitMorePullMode
+enum BlocksPullMode
 {
   None = 0,
   Down = 1,
   Up = 2,
 };
 
-enum MbitMoreDataFormat
+enum BlocksDataFormat
 {
   CONFIG = 0x10, // not used at this version
   PIN_EVENT = 0x11,
@@ -92,13 +92,13 @@ enum MbitMoreDataFormat
   DATA_TEXT = 0x14
 };
 
-enum MbitMoreActionEvent
+enum BlocksActionEvent
 {
   BUTTON = 0x01,
   GESTURE = 0x02
 };
 
-enum MbitMoreButtonEvent
+enum BlocksButtonEvent
 {
   DOWN = 1,
   UP = 2,
@@ -108,7 +108,7 @@ enum MbitMoreButtonEvent
   DOUBLE_CLICK = 6
 };
 
-enum MbitMoreGestureEvent
+enum BlocksGestureEvent
 {
   TILT_UP = 1,
   TILT_DOWN = 2,
@@ -123,7 +123,7 @@ enum MbitMoreGestureEvent
   SHAKE = 11
 };
 
-enum MbitMorePinEventType
+enum BlocksPinEventType
 {
   NONE = 0,
   ON_EDGE = 1,
@@ -131,7 +131,7 @@ enum MbitMorePinEventType
   ON_TOUCH = 3
 };
 
-enum MbitMorePinEvent
+enum BlocksPinEvent
 {
   RISE = 2,
   FALL = 3,
@@ -143,7 +143,7 @@ enum MbitMorePinEvent
  * @brief Enum for sub-command about configurations.
  * 
  */
-enum MbitMoreConfig
+enum BlocksConfig
 {
   MICPIN = 0x01, // microphone
   TOUCH = 0x02
@@ -153,10 +153,10 @@ enum MbitMoreConfig
  * @brief Enum for sub-commands about audio.
  * 
  */
-enum MbitMoreAudioCommand
+enum BlocksAudioCommand
 {
   STOP_TONE = 0x00,
   PLAY_TONE = 0x01,
 };
 
-#endif // MBIT_MORE_COMMON_H
+#endif // BLOCKS_COMMON_H

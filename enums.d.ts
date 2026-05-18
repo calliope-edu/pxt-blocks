@@ -5,16 +5,16 @@
      * Data type of content.
      */
 
-    declare const enum MbitMoreDataContentType
+    declare const enum BlocksDataContentType
     {
     //% block="number"
-    MM_DATA_NUMBER = 1,
+    BLOCKS_DATA_NUMBER = 1,
     //% block="text"
-    MM_DATA_TEXT = 2,
+    BLOCKS_DATA_TEXT = 2,
     }
 
 
-    declare const enum MbitMoreCommand
+    declare const enum BlocksCommand
     {
     CMD_CONFIG = 0x00,
     CMD_PIN = 0x01,
@@ -26,7 +26,7 @@
     }
 
 
-    declare const enum MbitMoreMotorCommand
+    declare const enum BlocksMotorCommand
     {
     SET_M0 = 0x01,
     SET_M1 = 0x02,
@@ -37,7 +37,7 @@
     }
 
 
-    declare const enum MbitMorePinCommand
+    declare const enum BlocksPinCommand
     {
     SET_OUTPUT = 0x01,
     SET_PWM = 0x02,
@@ -47,7 +47,7 @@
     }
 
 
-    declare const enum MbitMoreDisplayCommand
+    declare const enum BlocksDisplayCommand
     {
     CLEAR = 0x00,
     TEXT = 0x01,
@@ -60,14 +60,14 @@
      * @brief Enum for write mode of display pixels.
      */
 
-    declare const enum MbitMoreDisplayWriteMode
+    declare const enum BlocksDisplayWriteMode
     {
     LAYER = 0,
     OVER_WRITE = 1,
     }
 
 
-    declare const enum MbitMorePullMode
+    declare const enum BlocksPullMode
     {
     None = 0,
     Down = 1,
@@ -75,7 +75,7 @@
     }
 
 
-    declare const enum MbitMoreDataFormat
+    declare const enum BlocksDataFormat
     {
     CONFIG = 0x10,
     PIN_EVENT = 0x11,
@@ -85,14 +85,14 @@
     }
 
 
-    declare const enum MbitMoreActionEvent
+    declare const enum BlocksActionEvent
     {
     BUTTON = 0x01,
     GESTURE = 0x02,
     }
 
 
-    declare const enum MbitMoreButtonEvent
+    declare const enum BlocksButtonEvent
     {
     DOWN = 1,
     UP = 2,
@@ -103,7 +103,7 @@
     }
 
 
-    declare const enum MbitMoreGestureEvent
+    declare const enum BlocksGestureEvent
     {
     TILT_UP = 1,
     TILT_DOWN = 2,
@@ -119,7 +119,7 @@
     }
 
 
-    declare const enum MbitMorePinEventType
+    declare const enum BlocksPinEventType
     {
     NONE = 0,
     ON_EDGE = 1,
@@ -128,7 +128,7 @@
     }
 
 
-    declare const enum MbitMorePinEvent
+    declare const enum BlocksPinEvent
     {
     RISE = 2,
     FALL = 3,
@@ -142,7 +142,7 @@
      * 
      */
 
-    declare const enum MbitMoreConfig
+    declare const enum BlocksConfig
     {
     MICPIN = 0x01,
     TOUCH = 0x02,
@@ -154,7 +154,7 @@
      * 
      */
 
-    declare const enum MbitMoreAudioCommand
+    declare const enum BlocksAudioCommand
     {
     STOP_TONE = 0x00,
     PLAY_TONE = 0x01,
@@ -162,11 +162,11 @@
 
 
     /**
-     * @brief Button ID in MicrobitMore
+     * @brief Button ID in Blocks
      * This number is used to memory offset in state data.
      */
 
-    declare const enum MbitMoreButtonStateIndex
+    declare const enum BlocksButtonStateIndex
     {
     // GPIO array using [0..20]
     P0 = 24,
@@ -184,7 +184,7 @@
      * 
      */
 
-    declare const enum MbitMoreHardwareVersion
+    declare const enum BlocksHardwareVersion
     {
     MICROBIT_V1 = 1,
     MICROBIT_V2 = 2,
@@ -196,18 +196,18 @@
      * 
      */
 
-    declare const enum MbitMoreProtocol
+    declare const enum BlocksProtocol
     {
-    MBIT_MORE_V2 = 2,
+    BLOCKS_V2 = 2,
     }
 
 
     /**
-     * @brief Communication route between Scratch and micro:bit
+     * @brief Communication route between the blocks editor and the device
      * 
      */
 
-    declare const enum MbitMoreCommunicationRoute
+    declare const enum BlocksCommunicationRoute
     {
     BLE = 0,
     SERIAL = 1,
@@ -215,7 +215,7 @@
 
 
     /**
-     * @brief Request type from Scratch
+     * @brief Request type from the blocks editor
      * 
      */
 
@@ -230,7 +230,7 @@
 
 
     /**
-     * @brief Response type to Scratch
+     * @brief Response type to the blocks editor
      * 
      */
 
@@ -240,7 +240,7 @@
     RES_WRITE = 0x11,
     RES_NOTIFY = 0x21,
     }
-declare namespace MbitMore {
+declare namespace Blocks {
 }
 
 // Auto-generated. Do not edit. Really.

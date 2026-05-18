@@ -1,35 +1,31 @@
 
-# Microbit More v2 MakeCode Extension
+# Calliope Blocks Extension (pxt-blocks)
 
-This is a MakeCode extension for [Microbit More v2](https://microbit-more.github.io/).
+MakeCode/PXT extension that exposes a BLE service and matching USB serial
+protocol so the [Calliope Campus](https://github.com/calliope-edu/calliope-campus)
+Blocks editor can drive sensors, actuators, and messaging on a Calliope mini.
+
+Forked from upstream [Microbit More v2](https://github.com/microbit-more/pxt-mbit-more-v2);
+the wire protocol (GATT UUIDs, channel ids, SFD framing) is unchanged so existing
+clients keep working.
 
 ## Use as Extension
 
-This repository can be added as an **extension** in MakeCode.
+Add as an **extension** in MakeCode/Calliope for `calliopemini`:
 
-* open [https://makecode.microbit.org/](https://makecode.microbit.org/)
+* open the Calliope MakeCode editor
 * click on **New Project**
 * click on **Extensions** under the gearwheel menu
-* search for **https://github.com/microbit-more/pxt-mbit-more-v2** and import
-* code on the editor
-* click **Download** (which takes about **1 minutes** to compile at first time)
+* import this repository
 
-## Edit this project ![Build status badge](https://github.com/microbit-more/pxt-mbit-more-v2/workflows/MakeCode/badge.svg)
+## Blocks
 
-To edit this repository in MakeCode.
-
-* open [https://makecode.microbit.org/](https://makecode.microbit.org/)
-* click on **Import** then click on **Import URL**
-* paste **https://github.com/microbit-more/pxt-mbit-more-v2** and click import
-
-## Blocks preview
-
-This image shows the blocks code from the last commit in master.
-This image may take a few minutes to refresh.
-
-![A rendered view of the blocks](https://github.com/microbit-more/pxt-mbit-more-v2/raw/master/.github/makecode/blocks.png)
+The runtime registers a "Blocks" namespace with `on number $numberData with
+label $label`, `on text $textData with label $label`, `send number with
+label`, and `send text with label` blocks for messaging between the editor
+and the device.
 
 #### Metadata (used for search, rendering)
 
-* for PXT/microbit
+* for PXT/calliopemini
 <script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>

@@ -3,21 +3,21 @@
 #include "MicroBit.h"
 #include "MicroBitConfig.h"
 
-#include "MbitMoreCommon.h"
+#include "BlocksCommon.h"
 
 #define UPDATE_PERIOD 19
 #define NOTIFY_PERIOD 101
 
 #if MICROBIT_CODAL
-#include "MbitMoreService.h"
+#include "BlocksService.h"
 #else // NOT MICROBIT_CODAL
-#include "MbitMoreServiceDAL.h"
-using MbitMoreService = MbitMoreServiceDAL;
+#include "BlocksServiceDAL.h"
+using BlocksService = BlocksServiceDAL;
 #endif // NOT MICROBIT_CODAL
 
 //% color=#FF9900 weight=95 icon="\uf1b0"
-namespace MbitMore {
-  MbitMoreService *_pService = NULL;
+namespace Blocks {
+  BlocksService *_pService = NULL;
 #if MICROBIT_CODAL
 #else // NOT MICROBIT_CODAL
   int dummyDataLabelID = 0;
@@ -30,9 +30,9 @@ namespace MbitMore {
     }
   }
 
-  void notifyScratch() {
+  void notifyBlocks() {
     while (NULL != _pService) {
-      // notyfy data to Scratch
+      // notyfy data to the blocks editor
       _pService->notify();
       fiber_sleep(NOTIFY_PERIOD);
     }
@@ -43,14 +43,14 @@ namespace MbitMore {
    * 
    */
   //%
-  void startMbitMoreService() {
+  void startBlocksService() {
     if (NULL != _pService)
       return;
 
-    _pService = new MbitMoreService();
+    _pService = new BlocksService();
 
     create_fiber(update);
-    // create_fiber(notifyScratch);
+    // create_fiber(notifyBlocks);
   }
 
   /**
@@ -62,10 +62,10 @@ namespace MbitMore {
    * @return int ID for the label
    */
   //%
-  int call_registerWaitingDataLabel(String dataLabel, MbitMoreDataContentType dataType) {
+  int call_registerWaitingDataLabel(String dataLabel, BlocksDataContentType dataType) {
 #if MICROBIT_CODAL
     if (NULL == _pService)
-      startMbitMoreService();
+      startBlocksService();
 
     int labelID = _pService->registerWaitingDataLabel(MSTR(dataLabel), dataType);
     return labelID;
@@ -105,8 +105,8 @@ namespace MbitMore {
   }
 
   /**
-   * @brief Send a float with labele to Scratch.
-   * Do nothing if Scratch was not connected.
+   * @brief Send a float with labele to the blocks editor.
+   * Do nothing if the blocks editor was not connected.
    * 
    * @param dataLabel - label of the data
    * @param dataContent - content of the data
@@ -122,8 +122,8 @@ namespace MbitMore {
   }
 
   /**
-   * @brief Send a text with label to Scratch.
-   * Do nothing if Scratch was not connected.
+   * @brief Send a text with label to the blocks editor.
+   * Do nothing if the blocks editor was not connected.
    * 
    * @param dataLabel - label of the data
    * @param dataContent - content of the data
@@ -138,4 +138,4 @@ namespace MbitMore {
 #endif // MICROBIT_CODAL
   }
 
-} // namespace MbitMore
+} // namespace Blocks

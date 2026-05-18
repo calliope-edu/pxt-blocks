@@ -86,16 +86,16 @@ void copyManagedString(char *dst, ManagedString mstr, size_t maxLength) {
 /**
  * Position of data format in a value holder.
  */
-#define MBIT_MORE_DATA_FORMAT_INDEX 19
+#define BLOCKS_DATA_FORMAT_INDEX 19
 
-#include "MbitMoreDevice.h"
+#include "BlocksDevice.h"
 
 /**
  * Constructor.
  * Create a representation of the device for Microbit More service.
  * @param _uBit The instance of a MicroBit runtime.
  */
-MbitMoreDevice::MbitMoreDevice(MicroBit &_uBit) : uBit(_uBit) {
+BlocksDevice::BlocksDevice(MicroBit &_uBit) : uBit(_uBit) {
   // Reset compass
 
   if (!uBit.compass.isCalibrated()) {
@@ -128,13 +128,13 @@ MbitMoreDevice::MbitMoreDevice(MicroBit &_uBit) : uBit(_uBit) {
   uBit.messageBus.listen(
       MICROBIT_ID_BUTTON_A, MICROBIT_EVT_ANY,
       this,
-      &MbitMoreDevice::onButtonChanged,
+      &BlocksDevice::onButtonChanged,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
   uBit.messageBus.listen( 
       MICROBIT_ID_BUTTON_B,
       MICROBIT_EVT_ANY,
       this,
-      &MbitMoreDevice::onButtonChanged,
+      &BlocksDevice::onButtonChanged,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
 
 #if MICROBIT_CODAL
@@ -142,7 +142,7 @@ MbitMoreDevice::MbitMoreDevice(MicroBit &_uBit) : uBit(_uBit) {
       MICROBIT_ID_LOGO,
       MICROBIT_EVT_ANY,
       this,
-      &MbitMoreDevice::onButtonChanged,
+      &BlocksDevice::onButtonChanged,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
 #endif // MICROBIT_CODAL
 
@@ -150,35 +150,35 @@ MbitMoreDevice::MbitMoreDevice(MicroBit &_uBit) : uBit(_uBit) {
       MICROBIT_ID_GESTURE,
       MICROBIT_EVT_ANY,
       this,
-      &MbitMoreDevice::onGestureChanged,
+      &BlocksDevice::onGestureChanged,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
 
   uBit.messageBus.listen(
       MICROBIT_ID_BLE,
       MICROBIT_BLE_EVT_CONNECTED,
       this,
-      &MbitMoreDevice::onBLEConnected,
+      &BlocksDevice::onBLEConnected,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
   uBit.messageBus.listen(
       MICROBIT_ID_BLE,
       MICROBIT_BLE_EVT_DISCONNECTED,
       this,
-      &MbitMoreDevice::onBLEDisconnected,
+      &BlocksDevice::onBLEDisconnected,
       MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
-#if MBIT_MORE_USE_SERIAL
-  serialService = new MbitMoreSerial(*this);
-#endif // MBIT_MORE_USE_SERIAL
+#if BLOCKS_USE_SERIAL
+  serialService = new BlocksSerial(*this);
+#endif // BLOCKS_USE_SERIAL
 }
 
-MbitMoreDevice::~MbitMoreDevice() {
+BlocksDevice::~BlocksDevice() {
   uBit.messageBus.ignore(MICROBIT_ID_BUTTON_A, MICROBIT_EVT_ANY, this,
-                         &MbitMoreDevice::onButtonChanged);
+                         &BlocksDevice::onButtonChanged);
   uBit.messageBus.ignore(MICROBIT_ID_BUTTON_B, MICROBIT_EVT_ANY, this,
-                         &MbitMoreDevice::onButtonChanged);
+                         &BlocksDevice::onButtonChanged);
   uBit.messageBus.ignore(MICROBIT_ID_GESTURE, MICROBIT_EVT_ANY, this,
-                         &MbitMoreDevice::onGestureChanged);
+                         &BlocksDevice::onGestureChanged);
   uBit.messageBus.ignore(MICROBIT_ID_ANY, MICROBIT_EVT_ANY, this,
-                         &MbitMoreDevice::onPinEvent);
+                         &BlocksDevice::onPinEvent);
   delete basicService;
 }
 
@@ -186,10 +186,10 @@ MbitMoreDevice::~MbitMoreDevice() {
  * @brief Set pin configuration for initial.
  *
  */
-void MbitMoreDevice::initializeConfig() {
+void BlocksDevice::initializeConfig() {
   // P0,P1,P2,P3 are pull-up as standard extension.
   for (size_t i = 0; i < (sizeof(initialPullUp) / sizeof(initialPullUp[0])); i++) {
-    setPullMode(initialPullUp[i], MbitMorePullMode::Down);
+    setPullMode(initialPullUp[i], BlocksPullMode::Down);
     uBit.io.pin[initialPullUp[i]].getDigitalValue(); // set the pin to input-mode
   }
 }
@@ -198,14 +198,14 @@ void MbitMoreDevice::initializeConfig() {
  * @brief Update version data on the characteristic.
  * 
  */
-void MbitMoreDevice::updateVersionData() {
+void BlocksDevice::updateVersionData() {
   uint8_t *data = moreService->commandChBuffer;
 #if MICROBIT_CODAL
-  data[0] = MbitMoreHardwareVersion::MICROBIT_V2;
+  data[0] = BlocksHardwareVersion::MICROBIT_V2;
 #else // NOT MICROBIT_CODAL
-  data[0] = MbitMoreHardwareVersion::MICROBIT_V1;
+  data[0] = BlocksHardwareVersion::MICROBIT_V1;
 #endif // NOT MICROBIT_CODAL
-  data[1] = MbitMoreProtocol::MBIT_MORE_V2;
+  data[1] = BlocksProtocol::BLOCKS_V2;
 }
 
 /**
@@ -213,7 +213,7 @@ void MbitMoreDevice::updateVersionData() {
  * 
  * @param _e event which has connection data
  */
-void MbitMoreDevice::onBLEConnected(MicroBitEvent _e) {
+void BlocksDevice::onBLEConnected(MicroBitEvent _e) {
 #if MICROBIT_CODAL
   fiber_sleep(100); // to change pull-mode in micro:bit v2
 #endif // MICROBIT_CODAL
@@ -225,11 +225,11 @@ void MbitMoreDevice::onBLEConnected(MicroBitEvent _e) {
  *
  * @param _e event which has disconnection data
  */
-void MbitMoreDevice::onBLEDisconnected(MicroBitEvent _e) {
+void BlocksDevice::onBLEDisconnected(MicroBitEvent _e) {
   // Intentionally empty: do not reset on BLE drop so USB serial stays alive.
 }
 
-void MbitMoreDevice::onSerialConnected() {
+void BlocksDevice::onSerialConnected() {
   initializeConfig();
   serialConnected = true;
 }
@@ -240,32 +240,32 @@ void MbitMoreDevice::onSerialConnected() {
  * @param data
  * @param length
  */
-void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
+void BlocksDevice::onCommandReceived(uint8_t *data, size_t length) {
   const int command = (data[0] >> 5);
-  if(command == MbitMoreCommand::CMD_MOTOR) {
+  if(command == BlocksCommand::CMD_MOTOR) {
     const int motorCommand = data[0] & 0b11111;
     // data[1] = DIR: 0 | 1
     // data[2] = Motor Speed: 0 - 100
-    if(motorCommand == MbitMoreMotorCommand::SET_M0 || motorCommand == MbitMoreMotorCommand::SET_M1 || motorCommand == MbitMoreMotorCommand::SET_M0_M1){ 
+    if(motorCommand == BlocksMotorCommand::SET_M0 || motorCommand == BlocksMotorCommand::SET_M1 || motorCommand == BlocksMotorCommand::SET_M0_M1){ 
 #if MICROBIT_CODAL
         const int direction = data[1];
         const int speed = static_cast<int>((static_cast<double>(data[2]) / 100) * 1023); //Map 0-100 to 0-1023
         uBit.io.M_MODE.setDigitalValue(1);
-        if(motorCommand == MbitMoreMotorCommand::SET_M0 || motorCommand == MbitMoreMotorCommand::SET_M0_M1){ 
+        if(motorCommand == BlocksMotorCommand::SET_M0 || motorCommand == BlocksMotorCommand::SET_M0_M1){ 
             uBit.io.M_A_IN1.setDigitalValue(direction);
             uBit.io.M_A_IN2.setAnalogValue(speed);
         }
-        if(motorCommand == MbitMoreMotorCommand::SET_M1 || motorCommand == MbitMoreMotorCommand::SET_M0_M1){ 
+        if(motorCommand == BlocksMotorCommand::SET_M1 || motorCommand == BlocksMotorCommand::SET_M0_M1){ 
             uBit.io.M_B_IN1.setDigitalValue(direction);
             uBit.io.M_B_IN2.setAnalogValue(speed);
         }
 #else
         const int speed = data[2];
-        if(motorCommand == MbitMoreMotorCommand::SET_M0 || motorCommand == MbitMoreMotorCommand::SET_M0_M1){
+        if(motorCommand == BlocksMotorCommand::SET_M0 || motorCommand == BlocksMotorCommand::SET_M0_M1){
             if (speed <= 0) uBit.soundmotor.motorAOff();
             else uBit.soundmotor.motorAOn(speed);
         }
-        if(motorCommand == MbitMoreMotorCommand::SET_M1 || motorCommand == MbitMoreMotorCommand::SET_M0_M1){
+        if(motorCommand == BlocksMotorCommand::SET_M1 || motorCommand == BlocksMotorCommand::SET_M0_M1){
             if (speed <= 0) uBit.soundmotor.motorBOff();
             else uBit.soundmotor.motorBOn(speed);
         }
@@ -277,18 +277,18 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
       int buf[3];  // Define the buffer array
       buf[1] = direction;
       buf[2] = speed;
-      if (motorCommand == MbitMoreMotorCommand::SET_MOTIONKIT_LEFT || motorCommand == MbitMoreMotorCommand::SET_MOTIONKIT_BOTH) {
+      if (motorCommand == BlocksMotorCommand::SET_MOTIONKIT_LEFT || motorCommand == BlocksMotorCommand::SET_MOTIONKIT_BOTH) {
           buf[0] = 0x00;
           uBit.i2c.write(0x10 << 1, reinterpret_cast<BUFFER_TYPE>(buf), sizeof(buf), false); // Send the data
       }
-      if (motorCommand == MbitMoreMotorCommand::SET_MOTIONKIT_RIGHT || motorCommand == MbitMoreMotorCommand::SET_MOTIONKIT_BOTH) {
+      if (motorCommand == BlocksMotorCommand::SET_MOTIONKIT_RIGHT || motorCommand == BlocksMotorCommand::SET_MOTIONKIT_BOTH) {
           buf[0] = 0x02;
           uBit.i2c.write(0x10 << 1, reinterpret_cast<BUFFER_TYPE>(buf), sizeof(buf), false); // Send the data
       }
     }
 
 
-  } else if(command == MbitMoreCommand::CMD_RGB) {
+  } else if(command == BlocksCommand::CMD_RGB) {
 #if MICROBIT_CODAL
         uint8_t rgbBuffer[9] = {0};
         // Neopixel awaits GRB instead of RGB, so its swtiched here.
@@ -305,28 +305,28 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
 #else
         uBit.rgb.setColour(data[1], data[2], data[3], 0);
 #endif
-  } else if (command == MbitMoreCommand::CMD_DISPLAY) {
+  } else if (command == BlocksCommand::CMD_DISPLAY) {
     const int displayCommand = data[0] & 0b11111;
-    if (displayCommand == MbitMoreDisplayCommand::TEXT) {
+    if (displayCommand == BlocksDisplayCommand::TEXT) {
       char text[length - 1] = {0};
       memcpy(text, &(data[2]), length - 2);
       displayText(text, (data[1] * 10));
-    } else if (displayCommand == MbitMoreDisplayCommand::PIXELS_0) {
+    } else if (displayCommand == BlocksDisplayCommand::PIXELS_0) {
       setPixelsShadowLine(0, &data[1]);
       setPixelsShadowLine(1, &data[6]);
       setPixelsShadowLine(2, &data[11]);
-    } else if (displayCommand == MbitMoreDisplayCommand::PIXELS_1) {
+    } else if (displayCommand == BlocksDisplayCommand::PIXELS_1) {
       setPixelsShadowLine(3, &data[1]);
       setPixelsShadowLine(4, &data[6]);
       displayShadowPixels();
     }
-  } else if (command == MbitMoreCommand::CMD_PIN) {
+  } else if (command == BlocksCommand::CMD_PIN) {
     const int pinCommand = data[0] & 0b11111;
     int pinIndex = (int)data[1];
-    if (pinCommand == MbitMorePinCommand::SET_PULL) {
+    if (pinCommand == BlocksPinCommand::SET_PULL) {
       uBit.io.pin[pinIndex].getDigitalValue(); // set the pin to input mode
-      setPullMode(pinIndex, (MbitMorePullMode)data[2]);
-    } else if (pinCommand == MbitMorePinCommand::SET_OUTPUT) {
+      setPullMode(pinIndex, (BlocksPullMode)data[2]);
+    } else if (pinCommand == BlocksPinCommand::SET_OUTPUT) {
 #if MICROBIT_CODAL
       // workaround to set d-out from touch-mode in microbit-codal-v2
       if (touchMode[pinIndex]) {
@@ -334,12 +334,12 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
       }
 #endif // MICROBIT_CODAL
       setDigitalValue(pinIndex, data[2]);
-    } else if (pinCommand == MbitMorePinCommand::SET_PWM) {
+    } else if (pinCommand == BlocksPinCommand::SET_PWM) {
       // value is read as uint16_t little-endian.
       uint16_t value;
       memcpy(&value, &(data[2]), 2);
       setAnalogValue(pinIndex, value);
-    } else if (pinCommand == MbitMorePinCommand::SET_SERVO) {
+    } else if (pinCommand == BlocksPinCommand::SET_SERVO) {
       // angle is read as uint16_t little-endian.
       uint16_t angle;
       memcpy(&angle, &(data[2]), 2);
@@ -356,37 +356,37 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
       } else {
         uBit.io.pin[pinIndex].setServoValue(angle, range, center);
       }
-    } else if (pinCommand == MbitMorePinCommand::SET_EVENT) {
+    } else if (pinCommand == BlocksPinCommand::SET_EVENT) {
       listenPinEventOn(pinIndex, (int)data[2]);
     }
     touchMode[pinIndex] = false;
-  } else if (command == MbitMoreCommand::CMD_AUDIO) {
+  } else if (command == BlocksCommand::CMD_AUDIO) {
     int audioCommand = data[0] & 0b11111;
-    if (audioCommand == MbitMoreAudioCommand::PLAY_TONE) {
+    if (audioCommand == BlocksAudioCommand::PLAY_TONE) {
       uint32_t period;
       memcpy(&period, &(data[1]), 4);
       playTone(period, data[5]);
-    } else if (audioCommand == MbitMoreAudioCommand::STOP_TONE) {
+    } else if (audioCommand == BlocksAudioCommand::STOP_TONE) {
       stopTone();
     }
 #if MICROBIT_CODAL
-  } else if (command == MbitMoreCommand::CMD_DATA) {
-    MbitMoreDataContentType dataType = (MbitMoreDataContentType)(data[0] & 0b11111);
+  } else if (command == BlocksCommand::CMD_DATA) {
+    BlocksDataContentType dataType = (BlocksDataContentType)(data[0] & 0b11111);
     int index = findWaitingDataLabelIndex((char *)(&data[1]), dataType);
-    if (index != MBIT_MORE_WAITING_DATA_LABEL_NOT_FOUND) {
-      int contentStart = 1 + MBIT_MORE_DATA_LABEL_SIZE;
-      memset(receivedData[index].content, 0, MBIT_MORE_DATA_CONTENT_SIZE);
+    if (index != BLOCKS_WAITING_DATA_LABEL_NOT_FOUND) {
+      int contentStart = 1 + BLOCKS_DATA_LABEL_SIZE;
+      memset(receivedData[index].content, 0, BLOCKS_DATA_CONTENT_SIZE);
       memcpy(receivedData[index].content, &data[contentStart], length - contentStart);
-      MicroBitEvent evt(MBIT_MORE_DATA_RECEIVED, index + 1);
+      MicroBitEvent evt(BLOCKS_DATA_RECEIVED, index + 1);
     }
 #endif // MICROBIT_CODAL
-  } else if (command == MbitMoreCommand::CMD_CONFIG) {
+  } else if (command == BlocksCommand::CMD_CONFIG) {
     const int config = data[0] & 0b11111;
-    if (config == MbitMoreConfig::MICPIN) {
+    if (config == BlocksConfig::MICPIN) {
 #if MICROBIT_CODAL
       micInUse = ((data[1] == 1) ? true : false);
 #endif // MICROBIT_CODAL
-    } else if (config == MbitMoreConfig::TOUCH) {
+    } else if (config == BlocksConfig::TOUCH) {
       int pinIndex = data[1];
       if (pinIndex > 3)
         return;
@@ -396,7 +396,7 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
             componentID,
             MICROBIT_EVT_ANY,
             this,
-            &MbitMoreDevice::onButtonChanged,
+            &BlocksDevice::onButtonChanged,
             MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
 #if MICROBIT_CODAL
         if(data[3] == 1) {
@@ -413,7 +413,7 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
             componentID,
             MICROBIT_EVT_ANY,
             this,
-            &MbitMoreDevice::onButtonChanged);
+            &BlocksDevice::onButtonChanged);
       }
     }
   }
@@ -425,7 +425,7 @@ void MbitMoreDevice::onCommandReceived(uint8_t *data, size_t length) {
  * @param line Index of the lines to set.
  * @param pattern Array of brightness(0..255) according columns.
  */
-void MbitMoreDevice::setPixelsShadowLine(int line, uint8_t *pattern) {
+void BlocksDevice::setPixelsShadowLine(int line, uint8_t *pattern) {
   for (size_t col = 0; col < 5; col++) {
     shadowPixcels[line][col] = pattern[col];
   }
@@ -435,7 +435,7 @@ void MbitMoreDevice::setPixelsShadowLine(int line, uint8_t *pattern) {
  * @brief Display the shadow pixels on the LED.
  *
  */
-void MbitMoreDevice::displayShadowPixels() {
+void BlocksDevice::displayShadowPixels() {
   uBit.display.stopAnimation();
   for (size_t y = 0; y < 5; y++) {
     for (size_t x = 0; x < 5; x++) {
@@ -450,7 +450,7 @@ void MbitMoreDevice::displayShadowPixels() {
  * @param text Contents to display with null termination.
  * @param delay The time to delay between characters, in milliseconds.
  */
-void MbitMoreDevice::displayText(char *text, int delay) {
+void BlocksDevice::displayText(char *text, int delay) {
   ManagedString mstr(text);
   if (mstr.length() < 1) {
     return;
@@ -468,7 +468,7 @@ void MbitMoreDevice::displayText(char *text, int delay) {
  *
  * @param data Buffer for BLE characteristics.
  */
-void MbitMoreDevice::updateState(uint8_t *data) {
+void BlocksDevice::updateState(uint8_t *data) {
   uint32_t digitalLevels = 0;
   for (size_t i = 0; i < sizeof(gpioPin) / sizeof(gpioPin[0]); i++) {
     if (uBit.io.pin[gpioPin[i]].isDigital()) {
@@ -480,21 +480,21 @@ void MbitMoreDevice::updateState(uint8_t *data) {
     }
   }
   if (touchMode[0]) {
-    digitalLevels = digitalLevels | (uBit.io.pin[0].isTouched() << MbitMoreButtonStateIndex::P0);
+    digitalLevels = digitalLevels | (uBit.io.pin[0].isTouched() << BlocksButtonStateIndex::P0);
   }
   if (touchMode[1]) {
-    digitalLevels = digitalLevels | (uBit.io.pin[1].isTouched() << MbitMoreButtonStateIndex::P1);
+    digitalLevels = digitalLevels | (uBit.io.pin[1].isTouched() << BlocksButtonStateIndex::P1);
   }
   if (touchMode[2]) {
-    digitalLevels = digitalLevels | (uBit.io.pin[2].isTouched() << MbitMoreButtonStateIndex::P2);
+    digitalLevels = digitalLevels | (uBit.io.pin[2].isTouched() << BlocksButtonStateIndex::P2);
   }
   if (touchMode[3]) {
-    digitalLevels = digitalLevels | (uBit.io.pin[3].isTouched() << MbitMoreButtonStateIndex::P3);
+    digitalLevels = digitalLevels | (uBit.io.pin[3].isTouched() << BlocksButtonStateIndex::P3);
   }
-  digitalLevels = digitalLevels | (uBit.buttonA.isPressed() << MbitMoreButtonStateIndex::A);
-  digitalLevels = digitalLevels | (uBit.buttonB.isPressed() << MbitMoreButtonStateIndex::B);
+  digitalLevels = digitalLevels | (uBit.buttonA.isPressed() << BlocksButtonStateIndex::A);
+  digitalLevels = digitalLevels | (uBit.buttonB.isPressed() << BlocksButtonStateIndex::B);
 #if MICROBIT_CODAL
-  digitalLevels = digitalLevels | (uBit.logo.isPressed() << MbitMoreButtonStateIndex::LOGO);
+  digitalLevels = digitalLevels | (uBit.logo.isPressed() << BlocksButtonStateIndex::LOGO);
 #endif // MICROBIT_CODAL
   memcpy(data, (uint8_t *)&digitalLevels, 4);
   data[4] = sampleLightLevel();
@@ -511,7 +511,7 @@ void MbitMoreDevice::updateState(uint8_t *data) {
  *
  * @param data Buffer for BLE characteristics.
  */
-void MbitMoreDevice::updateMotion(uint8_t *data) {
+void BlocksDevice::updateMotion(uint8_t *data) {
   // Accelerometer
   int16_t rot;
   // Pitch (radians / 1000) is sent as int16_t little-endian [0..1].
@@ -555,7 +555,7 @@ void MbitMoreDevice::updateMotion(uint8_t *data) {
  * @param data Buffer for BLE characteristics.
  * @param pinIndex Index of the pin [0, 1, 2, 3].
  */
-void MbitMoreDevice::updateAnalogIn(uint8_t *data, size_t pinIndex) {
+void BlocksDevice::updateAnalogIn(uint8_t *data, size_t pinIndex) {
   if (uBit.io.pin[pinIndex].isInput()) {
 #if MICROBIT_CODAL
     uBit.io.pin[pinIndex].setPull(PullMode::None);
@@ -580,7 +580,7 @@ void MbitMoreDevice::updateAnalogIn(uint8_t *data, size_t pinIndex) {
  *
  * @return int Filtered light level.
  */
-int MbitMoreDevice::sampleLightLevel() {
+int BlocksDevice::sampleLightLevel() {
   lightLevelSamplesLast++;
   if (lightLevelSamplesLast == LIGHT_LEVEL_SAMPLES_SIZE) {
     lightLevelSamplesLast = 0;
@@ -595,7 +595,7 @@ int MbitMoreDevice::sampleLightLevel() {
  * @param period  PWM period (1000000 / frequency)[us]
  * @param volume laudness of the sound [0..255]
  */
-void MbitMoreDevice::playTone(int period, int volume) {
+void BlocksDevice::playTone(int period, int volume) {
 #if MICROBIT_CODAL
   MicroBitPin speakerPin = uBit.io.speaker;
 #else // NOT MICROBIT_CODAL
@@ -614,7 +614,7 @@ void MbitMoreDevice::playTone(int period, int volume) {
  * @brief Stop playing tone.
  * 
  */
-void MbitMoreDevice::stopTone() {
+void BlocksDevice::stopTone() {
 #if MICROBIT_CODAL
   MicroBitPin speakerPin = uBit.io.speaker;
 #else // NOT MICROBIT_CODAL
@@ -631,19 +631,19 @@ void MbitMoreDevice::stopTone() {
  * @param dataType type of the data
  * @return int index of the label
  */
-int MbitMoreDevice::findWaitingDataLabelIndex(const char *dataLabel, MbitMoreDataContentType dataType) {
-  for (int i = 0; i < MBIT_MORE_WAITING_DATA_LABELS_LENGTH; i++) {
+int BlocksDevice::findWaitingDataLabelIndex(const char *dataLabel, BlocksDataContentType dataType) {
+  for (int i = 0; i < BLOCKS_WAITING_DATA_LABELS_LENGTH; i++) {
     if (receivedData[i].label[0] == 0)
       continue;
     if (receivedData[i].type == dataType) {
       if (0 == strncmp(receivedData[i].label,
                        dataLabel,
-                       MBIT_MORE_DATA_LABEL_SIZE)) {
+                       BLOCKS_DATA_LABEL_SIZE)) {
         return i;
       }
     }
   }
-  return MBIT_MORE_WAITING_DATA_LABEL_NOT_FOUND;
+  return BLOCKS_WAITING_DATA_LABEL_NOT_FOUND;
 }
 
 /**
@@ -653,18 +653,18 @@ int MbitMoreDevice::findWaitingDataLabelIndex(const char *dataLabel, MbitMoreDat
  * @param dataType type of the data
  * @return int ID for the label
  */
-int MbitMoreDevice::registerWaitingDataLabel(ManagedString dataLabel, MbitMoreDataContentType dataType) {
+int BlocksDevice::registerWaitingDataLabel(ManagedString dataLabel, BlocksDataContentType dataType) {
   int index = findWaitingDataLabelIndex(dataLabel.toCharArray(), dataType);
-  if (index == MBIT_MORE_WAITING_DATA_LABEL_NOT_FOUND) {
+  if (index == BLOCKS_WAITING_DATA_LABEL_NOT_FOUND) {
     // find blank index and resister it
-    for (int i = 0; i < MBIT_MORE_WAITING_DATA_LABELS_LENGTH; i++) {
+    for (int i = 0; i < BLOCKS_WAITING_DATA_LABELS_LENGTH; i++) {
       if (receivedData[i].label[0] == 0) {
         index = i;
         receivedData[index].type = dataType;
         strncpy(
             receivedData[index].label,
             dataLabel.toCharArray(),
-            MBIT_MORE_DATA_LABEL_SIZE);
+            BLOCKS_DATA_LABEL_SIZE);
         return index + 1; // It is used for event value and must not be 0 (0 to accept any events).
       }
     }
@@ -678,7 +678,7 @@ int MbitMoreDevice::registerWaitingDataLabel(ManagedString dataLabel, MbitMoreDa
  * @param labelID ID of the label in received data
  * @return content type
  */
-MbitMoreDataContentType MbitMoreDevice::dataType(int labelID) {
+BlocksDataContentType BlocksDevice::dataType(int labelID) {
   return receivedData[labelID - 1].type;
 }
 
@@ -688,7 +688,7 @@ MbitMoreDataContentType MbitMoreDevice::dataType(int labelID) {
  * @param labelID ID of the label in received data
  * @return content of the data
  */
-float MbitMoreDevice::dataContentAsNumber(int labelID) {
+float BlocksDevice::dataContentAsNumber(int labelID) {
   float content;
   memcpy(&content, receivedData[labelID - 1].content, 4);
   return content;
@@ -700,7 +700,7 @@ float MbitMoreDevice::dataContentAsNumber(int labelID) {
  * @param labelID ID of the label in received data
  * @return content of the data
  */
-ManagedString MbitMoreDevice::dataContentAsText(int labelID) {
+ManagedString BlocksDevice::dataContentAsText(int labelID) {
   return ManagedString((char *)(receivedData[labelID - 1].content));
 }
 
@@ -710,18 +710,18 @@ ManagedString MbitMoreDevice::dataContentAsText(int labelID) {
  * @param dataLabel 
  * @param dataContent 
  */
-void MbitMoreDevice::sendNumberWithLabel(ManagedString dataLabel, float dataContent) {
+void BlocksDevice::sendNumberWithLabel(ManagedString dataLabel, float dataContent) {
   uint8_t *data = moreService->dataChBuffer;
-  memset(data, 0, MM_CH_BUFFER_SIZE_NOTIFY);
-  copyManagedString((char *)(&data[0]), dataLabel, MBIT_MORE_DATA_LABEL_SIZE);
-  memcpy(&data[MBIT_MORE_DATA_LABEL_SIZE], &dataContent, 4);
-  data[MBIT_MORE_DATA_FORMAT_INDEX] = MbitMoreDataFormat::DATA_NUMBER;
-#if MBIT_MORE_USE_SERIAL
+  memset(data, 0, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
+  copyManagedString((char *)(&data[0]), dataLabel, BLOCKS_DATA_LABEL_SIZE);
+  memcpy(&data[BLOCKS_DATA_LABEL_SIZE], &dataContent, 4);
+  data[BLOCKS_DATA_FORMAT_INDEX] = BlocksDataFormat::DATA_NUMBER;
+#if BLOCKS_USE_SERIAL
   if (serialConnected) {
-    serialService->notifyOnSerial(0x0130, data, MM_CH_BUFFER_SIZE_NOTIFY);
+    serialService->notifyOnSerial(0x0130, data, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
     return;
   }
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_USE_SERIAL
   moreService->notifyData();
 }
 
@@ -731,24 +731,24 @@ void MbitMoreDevice::sendNumberWithLabel(ManagedString dataLabel, float dataCont
  * @param dataLabel 
  * @param dataContent 
  */
-void MbitMoreDevice::sendTextWithLabel(ManagedString dataLabel, ManagedString dataContent) {
+void BlocksDevice::sendTextWithLabel(ManagedString dataLabel, ManagedString dataContent) {
   uint8_t *data = moreService->dataChBuffer;
-  memset(data, 0, MM_CH_BUFFER_SIZE_NOTIFY);
+  memset(data, 0, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
   copyManagedString(
       (char *)(&data[0]),
       dataLabel,
-      MBIT_MORE_DATA_LABEL_SIZE);
+      BLOCKS_DATA_LABEL_SIZE);
   copyManagedString(
-      (char *)(&data[MBIT_MORE_DATA_LABEL_SIZE]),
+      (char *)(&data[BLOCKS_DATA_LABEL_SIZE]),
       dataContent,
-      MBIT_MORE_DATA_CONTENT_SIZE);
-  data[MBIT_MORE_DATA_FORMAT_INDEX] = MbitMoreDataFormat::DATA_TEXT;
-#if MBIT_MORE_USE_SERIAL
+      BLOCKS_DATA_CONTENT_SIZE);
+  data[BLOCKS_DATA_FORMAT_INDEX] = BlocksDataFormat::DATA_TEXT;
+#if BLOCKS_USE_SERIAL
   if (serialConnected) {
-    serialService->notifyOnSerial(0x0130, data, MM_CH_BUFFER_SIZE_NOTIFY);
+    serialService->notifyOnSerial(0x0130, data, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
     return;
   }
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_USE_SERIAL
   moreService->notifyData();
 }
 
@@ -762,7 +762,7 @@ void MbitMoreDevice::sendTextWithLabel(ManagedString dataLabel, ManagedString da
  * @param pinIndex index in edge pins
  * @param eventType type of events
  */
-void MbitMoreDevice::listenPinEventOn(int pinIndex, int eventType) {
+void BlocksDevice::listenPinEventOn(int pinIndex, int eventType) {
   if (!isGpio(pinIndex)) {
     return;
   }
@@ -772,49 +772,49 @@ void MbitMoreDevice::listenPinEventOn(int pinIndex, int eventType) {
       componentID,
       MICROBIT_PIN_EVT_RISE,
       this,
-      &MbitMoreDevice::onPinEvent);
+      &BlocksDevice::onPinEvent);
   uBit.messageBus.ignore(
       componentID,
       MICROBIT_PIN_EVT_FALL,
       this,
-      &MbitMoreDevice::onPinEvent);
+      &BlocksDevice::onPinEvent);
   uBit.messageBus.ignore(
       componentID,
       MICROBIT_PIN_EVT_PULSE_HI,
       this,
-      &MbitMoreDevice::onPinEvent);
+      &BlocksDevice::onPinEvent);
   uBit.messageBus.ignore(
       componentID,
       MICROBIT_PIN_EVT_PULSE_LO,
       this,
-      &MbitMoreDevice::onPinEvent);
+      &BlocksDevice::onPinEvent);
 
-  if (eventType == MbitMorePinEventType::ON_EDGE) {
+  if (eventType == BlocksPinEventType::ON_EDGE) {
     uBit.messageBus.listen(
         componentID,
         MICROBIT_PIN_EVT_RISE,
         this,
-        &MbitMoreDevice::onPinEvent,
+        &BlocksDevice::onPinEvent,
         MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
     uBit.messageBus.listen(
         componentID,
         MICROBIT_PIN_EVT_FALL,
         this,
-        &MbitMoreDevice::onPinEvent,
+        &BlocksDevice::onPinEvent,
         MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
     uBit.io.pin[pinIndex].eventOn(MICROBIT_PIN_EVENT_ON_EDGE);
-  } else if (eventType == MbitMorePinEventType::ON_PULSE) {
+  } else if (eventType == BlocksPinEventType::ON_PULSE) {
     uBit.messageBus.listen(
         componentID,
         MICROBIT_PIN_EVT_PULSE_HI,
         this,
-        &MbitMoreDevice::onPinEvent,
+        &BlocksDevice::onPinEvent,
         MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
     uBit.messageBus.listen(
         componentID,
         MICROBIT_PIN_EVT_PULSE_LO,
         this,
-        &MbitMoreDevice::onPinEvent,
+        &BlocksDevice::onPinEvent,
         MESSAGE_BUS_LISTENER_QUEUE_IF_BUSY);
 #if MICROBIT_CODAL
     // ?? Freeze BLE when onEvent(PULSE) first time. ??
@@ -825,7 +825,7 @@ void MbitMoreDevice::listenPinEventOn(int pinIndex, int eventType) {
 #else // NOT MICROBIT_CODAL
     uBit.io.pin[pinIndex].eventOn(MICROBIT_PIN_EVENT_ON_PULSE);
 #endif // NOT MICROBIT_CODAL
-  } else if (eventType == MbitMorePinEventType::NONE) {
+  } else if (eventType == BlocksPinEventType::NONE) {
     uBit.io.pin[pinIndex].eventOn(MICROBIT_PIN_EVENT_NONE);
 #if MICROBIT_CODAL
     // ?? Pull-mode is released and will not be reset in this thread. ??
@@ -837,7 +837,7 @@ void MbitMoreDevice::listenPinEventOn(int pinIndex, int eventType) {
 /**
  * Callback. Invoked when a pin event sent.
  */
-void MbitMoreDevice::onPinEvent(MicroBitEvent evt) {
+void BlocksDevice::onPinEvent(MicroBitEvent evt) {
   uint8_t *data = moreService->pinEventChBuffer;
 
   // pinIndex is sent as uint8_t.
@@ -850,13 +850,13 @@ void MbitMoreDevice::onPinEvent(MicroBitEvent evt) {
   // downcast from uint64_t value.
   uint32_t timestamp = (uint32_t)evt.timestamp;
   memcpy(&(data[2]), &timestamp, 4);
-  data[MBIT_MORE_DATA_FORMAT_INDEX] = MbitMoreDataFormat::PIN_EVENT;
-#if MBIT_MORE_USE_SERIAL
+  data[BLOCKS_DATA_FORMAT_INDEX] = BlocksDataFormat::PIN_EVENT;
+#if BLOCKS_USE_SERIAL
   if (serialConnected) {
-    serialService->notifyOnSerial(0x0110, data, MM_CH_BUFFER_SIZE_NOTIFY);
+    serialService->notifyOnSerial(0x0110, data, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
     return;
   }
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_USE_SERIAL
   moreService->notifyPinEvent();
 }
 
@@ -865,9 +865,9 @@ void MbitMoreDevice::onPinEvent(MicroBitEvent evt) {
  * 
  * @param evt event which has button states
  */
-void MbitMoreDevice::onButtonChanged(MicroBitEvent evt) {
+void BlocksDevice::onButtonChanged(MicroBitEvent evt) {
   uint8_t *data = moreService->actionEventChBuffer;
-  data[0] = MbitMoreActionEvent::BUTTON;
+  data[0] = BlocksActionEvent::BUTTON;
   // source is a component ID that generated the event as uint16_t little-endian.
   // MICROBIT_ID_BUTTON_A, MICROBIT_ID_IO_P0, MICROBIT_ID_LOGO, etc.
   memcpy(&(data[1]), &evt.source, 2);
@@ -878,13 +878,13 @@ void MbitMoreDevice::onButtonChanged(MicroBitEvent evt) {
   // downcast from uint64_t value.
   uint32_t timestamp = (uint32_t)evt.timestamp;
   memcpy(&(data[4]), &timestamp, 4);
-  data[MBIT_MORE_DATA_FORMAT_INDEX] = MbitMoreDataFormat::ACTION_EVENT;
-#if MBIT_MORE_USE_SERIAL
+  data[BLOCKS_DATA_FORMAT_INDEX] = BlocksDataFormat::ACTION_EVENT;
+#if BLOCKS_USE_SERIAL
   if (serialConnected) {
-    serialService->notifyOnSerial(0x0111, data, MM_CH_BUFFER_SIZE_NOTIFY);
+    serialService->notifyOnSerial(0x0111, data, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
     return;
   }
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_USE_SERIAL
   moreService->notifyActionEvent();
 }
 
@@ -893,9 +893,9 @@ void MbitMoreDevice::onButtonChanged(MicroBitEvent evt) {
  * 
  * @param evt event which has gesture states.
  */
-void MbitMoreDevice::onGestureChanged(MicroBitEvent evt) {
+void BlocksDevice::onGestureChanged(MicroBitEvent evt) {
   uint8_t *data = moreService->actionEventChBuffer;
-  data[0] = MbitMoreActionEvent::GESTURE;
+  data[0] = BlocksActionEvent::GESTURE;
   // Event ID send as uint8_t.
   // MICROBIT_ACCELEROMETER_EVT_TILT_UP, MICROBIT_ACCELEROMETER_EVT_FACE_UP, etc.
   data[1] = (uint8_t)evt.value;
@@ -903,13 +903,13 @@ void MbitMoreDevice::onGestureChanged(MicroBitEvent evt) {
   // downcast from uint64_t value.
   uint32_t timestamp = (uint32_t)evt.timestamp;
   memcpy(&(data[2]), &timestamp, 4);
-  data[MBIT_MORE_DATA_FORMAT_INDEX] = MbitMoreDataFormat::ACTION_EVENT;
-#if MBIT_MORE_USE_SERIAL
+  data[BLOCKS_DATA_FORMAT_INDEX] = BlocksDataFormat::ACTION_EVENT;
+#if BLOCKS_USE_SERIAL
   if (serialConnected) {
-    serialService->notifyOnSerial(0x0111, data, MM_CH_BUFFER_SIZE_NOTIFY);
+    serialService->notifyOnSerial(0x0111, data, BLOCKS_CH_BUFFER_SIZE_NOTIFY);
     return;
   }
-#endif // MBIT_MORE_USE_SERIAL
+#endif // BLOCKS_USE_SERIAL
   moreService->notifyActionEvent();
 }
 
@@ -919,7 +919,7 @@ void MbitMoreDevice::onGestureChanged(MicroBitEvent evt) {
  * @param heading value of the compass heading
  * @return normalizes angle relative to north [degree]
  */
-int MbitMoreDevice::normalizeCompassHeading(int heading) {
+int BlocksDevice::normalizeCompassHeading(int heading) {
   if (uBit.accelerometer.getZ() > 0) {
     if (heading <= 180) {
       heading = 180 - heading;
@@ -936,17 +936,17 @@ int MbitMoreDevice::normalizeCompassHeading(int heading) {
  * @param pinIndex index to set
  * @param pull pull-mode to set
  */
-void MbitMoreDevice::setPullMode(int pinIndex, MbitMorePullMode pull) {
+void BlocksDevice::setPullMode(int pinIndex, BlocksPullMode pull) {
   pullMode[pinIndex] = pull;
 #if MICROBIT_CODAL
   switch (pull) {
-  case MbitMorePullMode::None:
+  case BlocksPullMode::None:
     uBit.io.pin[pinIndex].setPull(PullMode::None);
     break;
-  case MbitMorePullMode::Up:
+  case BlocksPullMode::Up:
     uBit.io.pin[pinIndex].setPull(PullMode::Up);
     break;
-  case MbitMorePullMode::Down:
+  case BlocksPullMode::Down:
     uBit.io.pin[pinIndex].setPull(PullMode::Down);
     break;
 
@@ -955,13 +955,13 @@ void MbitMoreDevice::setPullMode(int pinIndex, MbitMorePullMode pull) {
   }
 #else // NOT MICROBIT_CODAL
   switch (pull) {
-  case MbitMorePullMode::None:
+  case BlocksPullMode::None:
     uBit.io.pin[pinIndex].setPull(PinMode::PullNone);
     break;
-  case MbitMorePullMode::Up:
+  case BlocksPullMode::Up:
     uBit.io.pin[pinIndex].setPull(PinMode::PullUp);
     break;
-  case MbitMorePullMode::Down:
+  case BlocksPullMode::Down:
     uBit.io.pin[pinIndex].setPull(PinMode::PullDown);
     break;
 
@@ -977,7 +977,7 @@ void MbitMoreDevice::setPullMode(int pinIndex, MbitMorePullMode pull) {
  * @param pinIndex index in edge pins
  * @param value digital value [0 | 1]
  */
-void MbitMoreDevice::setDigitalValue(int pinIndex, int value) {
+void BlocksDevice::setDigitalValue(int pinIndex, int value) {
   uBit.io.pin[pinIndex].setDigitalValue(value);
 }
 
@@ -987,7 +987,7 @@ void MbitMoreDevice::setDigitalValue(int pinIndex, int value) {
  * @param pinIndex index in edge pins
  * @param value analog value (0..1024)
  */
-void MbitMoreDevice::setAnalogValue(int pinIndex, int value) {
+void BlocksDevice::setAnalogValue(int pinIndex, int value) {
 #if MICROBIT_CODAL
   // stable level is 0 .. 1022 in micro:bit v2,
   int validValue = value > 1022 ? 1022 : value;
@@ -1006,7 +1006,7 @@ void MbitMoreDevice::setAnalogValue(int pinIndex, int value) {
  * @param range which gives the span of possible values the i.e. the lower and upper bounds (center +/- range/2). Defaults to DEVICE_PIN_DEFAULT_SERVO_RANGE.
  * @param center the center point from which to calculate the lower and upper bounds. Defaults to DEVICE_PIN_DEFAULT_SERVO_CENTER
  */
-void MbitMoreDevice::setServoValue(int pinIndex, int angle, int range,
+void BlocksDevice::setServoValue(int pinIndex, int angle, int range,
                                    int center) {
   uBit.io.pin[pinIndex].setServoValue(angle, range, center);
 }
@@ -1015,7 +1015,7 @@ void MbitMoreDevice::setServoValue(int pinIndex, int angle, int range,
  * @brief Display friendly name of the micro:bit.
  * 
  */
-void MbitMoreDevice::displayFriendlyName() {
+void BlocksDevice::displayFriendlyName() {
   if (serialConnected)
     return;
   uBit.display.scrollAsync(ManagedString(microbit_friendly_name()), 120);
@@ -1025,7 +1025,7 @@ void MbitMoreDevice::displayFriendlyName() {
  * @brief Display software version of Microbit More.
  * 
  */
-void MbitMoreDevice::displayVersion() {
+void BlocksDevice::displayVersion() {
   uBit.display.scrollAsync(ManagedString(" -M 0.2.5- "), 120);
 }
 
@@ -1036,7 +1036,7 @@ void MbitMoreDevice::displayVersion() {
  * @return true the pin is a GPIO
  * @return false the pin is not a GPIO
  */
-bool MbitMoreDevice::isGpio(int pinIndex) {
+bool BlocksDevice::isGpio(int pinIndex) {
   for (size_t i = 0; i < (sizeof(gpioPin) / sizeof(gpioPin[0])); i++) {
     if (pinIndex == gpioPin[i])
       return true;

@@ -5,26 +5,26 @@
 
 #if !MICROBIT_CODAL
 
-#ifndef MBIT_MORE_SERVICE_DAL_H
-#define MBIT_MORE_SERVICE_DAL_H
+#ifndef BLOCKS_SERVICE_DAL_H
+#define BLOCKS_SERVICE_DAL_H
 
-#include "MbitMoreCommon.h"
-#include "MbitMoreDevice.h"
+#include "BlocksCommon.h"
+#include "BlocksDevice.h"
 
 // // Forward declaration
-class MbitMoreDevice;
+class BlocksDevice;
 
 /**
  * Class definition for a MicroBitMore Service.
- * Provides a BLE service to remotely read the state of sensors from Scratch3.
+ * Provides a BLE service to remotely read the state of sensors from the blocks editor3.
  */
-class MbitMoreServiceDAL {
+class BlocksServiceDAL {
 public:
   /**
    * Constructor.
-   * Create a representation of the MbitMoreService
+   * Create a representation of the BlocksService
    */
-  MbitMoreServiceDAL();
+  BlocksServiceDAL();
 
   /**
    * Invoked when BLE connected.
@@ -56,31 +56,31 @@ public:
   void update();
 
   // Buffer of characteristic for receiving commands.
-  uint8_t commandChBuffer[MM_CH_BUFFER_SIZE_COMMAND] = {0};
+  uint8_t commandChBuffer[BLOCKS_CH_BUFFER_SIZE_COMMAND] = {0};
 
   // Buffer of characteristic for sending data of GPIO and sensors state.
-  uint8_t stateChBuffer[MM_CH_BUFFER_SIZE_STATE] = {0};
+  uint8_t stateChBuffer[BLOCKS_CH_BUFFER_SIZE_STATE] = {0};
 
   // Buffer of characteristic for sending data about motion.
-  uint8_t motionChBuffer[MM_CH_BUFFER_SIZE_MOTION] = {0};
+  uint8_t motionChBuffer[BLOCKS_CH_BUFFER_SIZE_MOTION] = {0};
 
   // Buffer of characteristic for sending pin events.
-  uint8_t pinEventChBuffer[MM_CH_BUFFER_SIZE_NOTIFY] = {0};
+  uint8_t pinEventChBuffer[BLOCKS_CH_BUFFER_SIZE_NOTIFY] = {0};
 
   // Buffer of characteristic for sending action events.
-  uint8_t actionEventChBuffer[MM_CH_BUFFER_SIZE_NOTIFY] = {0};
+  uint8_t actionEventChBuffer[BLOCKS_CH_BUFFER_SIZE_NOTIFY] = {0};
 
   // Buffer of characteristic for sending analog input values of P0.
-  uint8_t analogInP0ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+  uint8_t analogInP0ChBuffer[BLOCKS_CH_BUFFER_SIZE_ANALOG_IN] = {0};
 
   // Buffer of characteristic for sending analog input values of P1.
-  uint8_t analogInP1ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+  uint8_t analogInP1ChBuffer[BLOCKS_CH_BUFFER_SIZE_ANALOG_IN] = {0};
 
   // Buffer of characteristic for sending analog input values of P2.
-  uint8_t analogInP2ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+  uint8_t analogInP2ChBuffer[BLOCKS_CH_BUFFER_SIZE_ANALOG_IN] = {0};
 
   // Buffer of characteristic for sending analog input values of P3.
-  uint8_t analogInP3ChBuffer[MM_CH_BUFFER_SIZE_ANALOG_IN] = {0};
+  uint8_t analogInP3ChBuffer[BLOCKS_CH_BUFFER_SIZE_ANALOG_IN] = {0};
 
 private:
   /**
@@ -93,7 +93,7 @@ private:
    * @brief Microbit More object.
    *
    */
-  MbitMoreDevice *mbitMore;
+  BlocksDevice *blocks;
 
   GattCharacteristic *commandCh;
   GattCharacteristic *stateCh;
@@ -106,5 +106,5 @@ private:
   GattCharacteristic *analogInP3Ch;
 };
 
-#endif // MBIT_MORE_SERVICE_DAL_H
+#endif // BLOCKS_SERVICE_DAL_H
 #endif // !MICROBIT_CODAL
